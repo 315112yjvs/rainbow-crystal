@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>彩虹數字 × 水晶手鍊客製化工具</title>
+<style>
+@font-face {
+  font-family: 'JinXuan';
+  src: url('金萱那堤jf-jinxuanlatte-2.0-bold.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; font-family: 'JinXuan', -apple-system, BlinkMacSystemFont, 'Noto Sans TC', sans-serif; }
+:root {
+  --bg: #ffffff; --bg2: #f7f6f2; --bg3: #f1efe8;
+  --text: #1a1a18; --text2: #5f5e5a; --text3: #9c9a92;
+  --border: rgba(0,0,0,0.10); --border2: rgba(0,0,0,0.20);
+  --radius: 10px; --radius-lg: 14px; --accent: #0F6E56;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1c1c1a; --bg2: #252523; --bg3: #2e2e2b;
+    --text: #e8e6de; --text2: #a8a69e; --text3: #6e6c66;
+    --border: rgba(255,255,255,0.08); --border2: rgba(255,255,255,0.18);
+  }
+}
+body { font-family: 'JinXuan', -apple-system, BlinkMacSystemFont, 'Noto Sans TC', sans-serif; background: var(--bg3); color: var(--text); min-height: 100vh; }
+header { background: var(--bg); border-bottom: 0.5px solid var(--border); padding: 1.25rem 1.5rem; text-align: center; }
+header h1 { font-size: 20px; font-weight: 600; }
+header p { font-size: 13px; color: var(--text2); margin-top: 4px; }
+.container { max-width: 740px; margin: 0 auto; padding: 1.25rem 1rem 3rem; }
+.tabs { display: flex; gap: 6px; margin-bottom: 16px; flex-wrap: wrap; }
+.tab { padding: 6px 16px; font-size: 13px; border: 0.5px solid var(--border2); border-radius: 20px; background: transparent; color: var(--text2); cursor: pointer; transition: all 0.15s; }
+.tab:hover { background: var(--bg2); }
+.tab.active { background: var(--text); color: var(--bg); border-color: var(--text); }
+.card { background: var(--bg); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 1.1rem 1.25rem; margin-bottom: 12px; }
+.sec { font-size: 11px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 12px; }
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+.row3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+@media (max-width: 520px) { .row2, .row3, .dual-panel { grid-template-columns: 1fr; } }
+label { font-size: 12px; color: var(--text2); display: block; margin-bottom: 5px; }
+input, select, textarea { width: 100%; font-size: 13px; padding: 8px 11px; border: 0.5px solid var(--border2); border-radius: var(--radius); background: var(--bg2); color: var(--text); outline: none; }
+input:focus, select:focus, textarea:focus { border-color: var(--accent); }
+textarea { resize: vertical; line-height: 1.7; min-height: 72px; }
+.hint { font-size: 11px; color: var(--text3); margin-top: 5px; }
+.btn { background: var(--text); color: var(--bg); border: none; border-radius: var(--radius); padding: 10px 20px; font-size: 14px; font-weight: 600; cursor: pointer; width: 100%; margin-top: 6px; }
+.btn:hover { opacity: 0.85; }
+.hidden { display: none; }
+.dual-panel { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+.panel { border-radius: var(--radius); padding: 12px; border: 0.5px solid; }
+.p-yang { background: #FFF9EE; border-color: #BA7517; }
+.p-yin  { background: #EEF4FF; border-color: #3B5BA5; }
+.ptitle { font-size: 12px; font-weight: 600; margin-bottom: 9px; }
+.p-yang .ptitle { color: #633806; }
+.p-yin  .ptitle { color: #1E3A7A; }
+.ngrid { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 6px; }
+.nc { width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; border-radius: 50%; border: 1.5px solid transparent; position: relative; }
+.nc-yang-has  { background: #FAEEDA; border-color: #BA7517; color: #633806; }
+.nc-yang-miss { background: var(--bg3); border-color: var(--border); color: var(--text3); }
+.nc-yang-ly   { background: #E1F5EE; border-color: #0F6E56; color: #04342C; } /* kept for reference, no longer primary */
+.nc-yin-has   { background: #D8E6FF; border-color: #3B5BA5; color: #1E3A7A; }
+.nc-yin-miss  { background: var(--bg3); border-color: var(--border); color: var(--text3); }
+.nc-yin-ly    { background: #E1F5EE; border-color: #0F6E56; color: #04342C; }
+.nc-master { border-width: 2px; border-style: double; }
+.plife { font-size: 11px; margin-top: 6px; padding-top: 6px; border-top: 0.5px solid rgba(0,0,0,0.08); line-height: 1.6; }
+.legend { display: flex; flex-wrap: wrap; gap: 10px; font-size: 11px; color: var(--text2); margin-bottom: 12px; }
+.leg { display: flex; align-items: center; gap: 5px; }
+.ldot { width: 13px; height: 13px; border-radius: 50%; border: 1.5px solid; flex-shrink: 0; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+.chip { display: inline-flex; align-items: center; padding: 4px 11px; border-radius: 20px; font-size: 12px; font-weight: 500; border: 1px solid; }
+.ch-master { background: #FFF0F0; border-color: #C84040; color: #802020; }
+.ch-both   { background: #F0E8FF; border-color: #7A6AA0; color: #3C2C6A; }
+.ch-yang   { background: #FAEEDA; border-color: #BA7517; color: #633806; }
+.ch-yin    { background: #D8E6FF; border-color: #3B5BA5; color: #1E3A7A; }
+.ch-ly     { background: #E1F5EE; border-color: #0F6E56; color: #04342C; }
+.crow { display: flex; align-items: flex-start; gap: 11px; padding: 11px 13px; border-radius: var(--radius); border: 0.5px solid var(--border); background: var(--bg2); margin-bottom: 8px; }
+.crow.top { border-color: #0F6E56; border-width: 1px; }
+.cicon { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+.cname { font-size: 13px; font-weight: 600; color: var(--text); }
+.csub  { font-size: 11px; color: var(--text2); margin-top: 3px; line-height: 1.6; }
+.cstones { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 6px; }
+.stone-chip { font-size: 11px; padding: 2px 8px; border-radius: 10px; background: var(--bg3); border: 0.5px solid var(--border2); color: var(--text2); cursor: default; }
+.stone-list { display: flex; flex-direction: column; gap: 5px; margin-top: 7px; }
+.stone-item { display: block; padding: 5px 8px; border-radius: 7px; background: var(--bg3); border-left: 3px solid; cursor: pointer; }
+.stone-item:hover { background: var(--bg2); }
+.stone-item:has(input:checked) { background: #E8F5F1; border-left-width: 4px; }
+.btn-print { background: #0F6E56; color: #fff; border: none; border-radius: var(--radius); padding: 10px 20px; font-size: 14px; font-weight: 600; cursor: pointer; width: 100%; margin-top: 8px; }
+.btn-print:hover { opacity: 0.85; }
+#print-area { display: none; }
+@media print {
+  @page { size: A5 portrait; margin: 7mm 8mm; }
+  * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+  body > *:not(#print-area) { display: none !important; }
+  #print-area { display: block !important; }
+}
+.stone-name { font-size: 11px; font-weight: 600; color: var(--text); }
+.stone-desc { font-size: 10px; color: var(--text2); margin-top: 2px; line-height: 1.5; }
+.tag { display: inline-block; font-size: 10px; padding: 1px 7px; border-radius: 8px; margin-left: 6px; vertical-align: middle; }
+.tg-m { background: #FFF0F0; color: #802020; }
+.tg-b { background: #F0E8FF; color: #3C2C6A; }
+.tg-y { background: #FAEEDA; color: #633806; }
+.tg-n { background: #D8E6FF; color: #1E3A7A; }
+.tg-l { background: #E1F5EE; color: #04342C; }
+.tg-s { background: var(--bg3); color: var(--text2); }
+.bracelet-outer { background: var(--bg2); border-radius: var(--radius); padding: 14px; margin-bottom: 10px; }
+.bracelet-wrap { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 3px; min-height: 50px; }
+.bead { border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 8px; color: #fff; font-weight: 600; text-align: center; line-height: 1.1; border: 1.5px solid rgba(255,255,255,0.35); flex-shrink: 0; }
+.bracelet-legend { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; padding-top: 10px; border-top: 0.5px solid var(--border); }
+.bl-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--text2); }
+.bl-dot { width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0; }
+.pattern-info { font-size: 11px; color: var(--text2); margin-top: 6px; text-align: center; }
+.bead-info { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; margin-bottom: 10px; }
+.binfo { background: var(--bg2); border-radius: var(--radius); padding: 8px; text-align: center; }
+.binfo-num { font-size: 18px; font-weight: 600; color: var(--text); }
+.binfo-lbl { font-size: 10px; color: var(--text2); margin-top: 2px; }
+.master-box { border-radius: var(--radius); padding: 11px 14px; margin-bottom: 12px; font-size: 12px; line-height: 1.8; }
+.master-yang { background: #FFF8F8; border: 1px solid #E0A0A0; color: #5A2020; }
+.master-yin  { background: #F0F8FF; border: 1px solid #A0C0E0; color: #1E3A7A; }
+.master-yang strong { color: #802020; }
+.master-yin  strong { color: #1E3A7A; }
+.sum-box { background: var(--bg2); border-radius: var(--radius); padding: 12px 14px; font-size: 13px; color: var(--text); line-height: 1.9; margin-bottom: 14px; }
+.hl  { color: #0F6E56; font-weight: 600; }
+.hl-b{ color: #1E3A7A; font-weight: 600; }
+.hl-r{ color: #802020; font-weight: 600; }
+.spare-title { font-size: 11px; color: var(--text2); margin: 12px 0 8px; padding-top: 8px; border-top: 0.5px solid var(--border); }
+.rtable { width: 100%; border-collapse: collapse; font-size: 12px; }
+.rtable th { font-weight: 600; color: var(--text2); padding: 7px 9px; text-align: left; border-bottom: 0.5px solid var(--border); }
+.rtable td { padding: 8px 9px; border-bottom: 0.5px solid var(--border); color: var(--text); vertical-align: top; }
+.rtable tr:last-child td { border-bottom: none; }
+.info-box { background: var(--bg2); border-left: 2px solid var(--border2); border-radius: 0 var(--radius) var(--radius) 0; padding: 10px 14px; font-size: 12px; color: var(--text2); line-height: 1.8; margin-bottom: 10px; }
+.info-box strong { color: var(--text); }
+footer { text-align: center; font-size: 11px; color: var(--text3); padding: 1.5rem 1rem; }
+</style>
+</head>
+<body>
+<header>
+  <h1>✦ 彩虹數字 × 水晶手鍊</h1>
+  <p>輸入陽曆與陰曆生日，找出專屬能量缺口，設計客製化水晶手鍊</p>
+</header>
+<div class="container">
+<div class="tabs">
+  <button class="tab active" onclick="sw('calc')">客製化分析</button>
+  <button class="tab" onclick="sw('ref')">數字水晶對照</button>
+  <button class="tab" onclick="sw('how')">系統說明</button>
+</div>
+
+<div id="tab-calc">
+  <div class="card">
+    <div class="sec">客戶資料</div>
+    <div class="row2">
+      <div><label>客戶姓名（選填）</label><input id="iname" type="text" placeholder="例：小明"></div>
+      <div><label>性別</label>
+        <select id="igender"><option value="F">女生</option><option value="M">男生</option></select>
+      </div>
+    </div>
+    <div class="row2" style="margin-bottom:6px">
+      <div>
+        <label>☀️ 陽曆生日（外在面向）</label>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px">
+          <div><label>西元年</label><input id="isolar-year" type="number" placeholder="例：1998" min="1900" max="2100"></div>
+          <div><label>月</label><input id="isolar-month" type="number" placeholder="月" min="1" max="12"></div>
+          <div><label>日</label><input id="isolar-day" type="number" placeholder="日" min="1" max="31"></div>
+        </div>
+      </div>
+      <div>
+        <label>🌙 陰曆生日（內在面向）</label>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px">
+          <div><label>西元年</label><input id="ily-year" type="number" placeholder="例：1998" min="1900" max="2100"></div>
+          <div><label>月</label><input id="ilm" type="number" placeholder="月" min="1" max="12"></div>
+          <div><label>日</label><input id="ild" type="number" placeholder="日" min="1" max="30"></div>
+        </div>
+        <div class="hint">⚠️ 年頭出生者陰曆西元年可能與陽曆不同</div>
+      </div>
+    </div>
+    <div class="row3">
+      <div><label>手圍（cm）</label><input id="iwrist" type="number" placeholder="例：16" min="12" max="28" step="0.5"></div>
+      <div><label>今年流年（留空自動算）</label><input id="ilynum" type="number" placeholder="1–9" min="1" max="9"></div>
+      <div><label>分析重心</label>
+        <select id="ifocus">
+          <option value="both">陰陽並重</option>
+          <option value="yang">外在優先</option>
+          <option value="yin">內在優先</option>
+        </select>
+      </div>
+    </div>
+    <button class="btn" id="calcbtn">✦ 分析彩虹數字 &amp; 設計水晶手鍊</button>
+  </div>
+
+  <div id="result" class="hidden">
+    <div id="master-area"></div>
+    <div class="card">
+      <div class="sec">數字盤</div>
+      <div id="sumbox" class="sum-box"></div>
+      <div class="legend">
+        <div class="leg"><div class="ldot" style="background:#FAEEDA;border-color:#BA7517"></div>陽曆具備</div>
+        <div class="leg"><div class="ldot" style="background:#D8E6FF;border-color:#3B5BA5"></div>陰曆具備</div>
+        <div class="leg"><span style="color:#0F6E56;font-size:13px;line-height:1">★</span>流年</div>
+        <div class="leg"><div class="ldot" style="background:#eeece6;border-color:#ccc"></div>缺少</div>
+      </div>
+      <div class="dual-panel">
+        <div class="panel p-yang">
+          <div class="ptitle">☀️ 陽曆 — 外在面向</div>
+          <div class="ngrid" id="yang-grid"></div>
+          <div class="plife" id="yang-life" style="color:#633806"></div>
+        </div>
+        <div class="panel p-yin">
+          <div class="ptitle">🌙 陰曆 — 內在面向</div>
+          <div class="ngrid" id="yin-grid"></div>
+          <div class="plife" id="yin-life" style="color:#1E3A7A"></div>
+        </div>
+      </div>
+      <div class="sec">缺數清單（優先度排序）</div>
+      <div id="miss-chips" class="chips"></div>
+    </div>
+    <div class="card">
+      <div class="sec" style="display:flex;justify-content:space-between;align-items:center;">
+        <span>推薦水晶配置</span>
+        <span id="stone-count" style="font-size:11px;color:var(--accent);font-weight:600;letter-spacing:0;text-transform:none;"></span>
+      </div>
+      <div id="crystal-main"></div>
+      <div id="crystal-spare"></div>
+    </div>
+    <div class="card">
+      <div class="sec">手鍊設計（好運數字串法）</div>
+      <div id="bead-info" class="bead-info"></div>
+      <div class="bracelet-outer">
+        <div id="bracelet" class="bracelet-wrap"></div>
+        <div id="bracelet-legend" class="bracelet-legend"></div>
+      </div>
+      <div id="pattern-info" class="pattern-info"></div>
+    </div>
+    <div class="card" id="msg-card" style="display:none;">
+      <div class="sec" id="msg-label">給客戶的一句話</div>
+      <textarea id="imsg" placeholder="在這裡輸入想對客戶說的話，會一併印入報告中..."></textarea>
+    </div>
+    <button class="btn-print" onclick="doPrint()">🖨 列印 / 輸出 PDF（A5）</button>
+  </div>
+</div>
+
+<div id="tab-ref" class="hidden">
+  <div class="card">
+    <div class="sec">彩虹數字 × 水晶對照表</div>
+    <table class="rtable">
+      <tr><th>數字</th><th>主題</th><th>推薦水晶</th></tr>
+      <tr><td><strong>1</strong></td><td>獨立・領袖</td><td>紅膠花、石榴石、金曜石、茶晶、黑曜石</td></tr>
+      <tr><td><strong>2</strong></td><td>合作・直覺</td><td>太陽石、橙月光石、月光石、灰月光、石榴石</td></tr>
+      <tr><td><strong>3</strong></td><td>表達・創意</td><td>黃水晶、檸檬晶、金髮晶、黃虎眼、黃阿塞</td></tr>
+      <tr><td><strong>4</strong></td><td>穩定・務實</td><td>綠幽靈、葡萄石、天河石、草莓晶、綠草莓</td></tr>
+      <tr><td><strong>5</strong></td><td>自由・變化</td><td>海藍寶、天河石、藍晶石、透體藍針、灰月光</td></tr>
+      <tr><td><strong>6</strong></td><td>愛・責任</td><td>粉晶、草莓晶、藍月光石、堇青石、灰月光</td></tr>
+      <tr><td><strong>7</strong></td><td>智慧・靈性</td><td>紫水晶、紫鋰輝、白水晶、藍月光石、白阿賽</td></tr>
+      <tr><td><strong>8</strong></td><td>豐盛・力量</td><td>金髮晶、虎眼石、茶晶、紫鋰輝</td></tr>
+      <tr><td><strong>9</strong></td><td>完成・慈悲</td><td>白水晶、藍月光石、白阿賽、紫鋰輝</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <div class="sec">好運數字串法說明</div>
+    <table class="rtable">
+      <tr><th>類型</th><th>數字</th><th>意義</th></tr>
+      <tr><td>生氣</td><td>14、41</td><td>無限的貴人與成功機會</td></tr>
+      <tr><td>天醫</td><td>13、31</td><td>九命怪貓的領袖、延續後代</td></tr>
+      <tr><td>伏位</td><td>11</td><td>等待與內斂的耐心</td></tr>
+    </table>
+    <div style="margin-top:10px;font-size:12px;color:var(--text2);line-height:1.8">
+      串法：14→41→13→31→11 首尾共用，單元 [1,4,1,3,1,1]，循環成圈。<br>
+      4顆位 → 第1優先水晶（最缺）｜ 3顆位 → 第2優先水晶 ｜ 1顆位 → 其他水晶輪替<br>
+      白水晶：點綴穿插，整串約 2–3 顆
+    </div>
+  </div>
+  <div class="card">
+    <div class="sec">大師數說明</div>
+    <table class="rtable">
+      <tr><th>大師數</th><th>化簡後</th><th>能量特質</th></tr>
+      <tr><td><strong>11</strong></td><td>2</td><td>超強直覺與靈性感知，命數 2 中能量最強</td></tr>
+      <tr><td><strong>22</strong></td><td>4</td><td>大師建造者，將夢想落地實現的強大執行力</td></tr>
+      <tr><td><strong>33</strong></td><td>6</td><td>大師療癒者，無條件的愛與奉獻，慈悲能量極強</td></tr>
+    </table>
+  </div>
+</div>
+
+<div id="tab-how" class="hidden">
+  <div class="card">
+    <div class="sec">系統規則說明</div>
+    <div class="info-box"><strong>九宮格各自獨立</strong><br>陽曆格只根據陽曆數字顯示，陰曆格只根據陰曆數字顯示，大師數星星也各自獨立。陽曆★紅色，陰曆★藍色。</div>
+    <div class="info-box"><strong>陽曆</strong>：年月日所有個別數字 + 命數（過渡數與最終數）→ 陽曆具備數字</div>
+    <div class="info-box"><strong>陰曆</strong>：年月日所有個別數字 + 命數（過渡數與最終數）→ 陰曆具備數字。陰曆西元年需獨立填寫，年頭出生者可能與陽曆不同。</div>
+    <div class="info-box"><strong>缺數分析（合併判斷）</strong><br>陰陽皆缺 → 最優先 ｜ 只陽曆缺 → 外在缺 ｜ 只陰曆缺 → 內在缺</div>
+    <div class="info-box"><strong>推薦邏輯</strong><br>主推薦最多 3 個，備選最多 3 個，每個數字列出所有可選水晶。<br>優先順序：命數是缺數 → 陰陽皆缺 → 流年 → 只陽曆缺 → 只陰曆缺</div>
+    <div class="info-box"><strong>好運數字串法</strong><br>14→41→13→31→11 首尾共用，展開 [1,4,1,3,1,1]，循環成圈。<br>4顆位 = 第1優先，3顆位 = 第2優先，1顆位 = 其他水晶輪替。白水晶點綴約 2–3 顆。</div>
+  </div>
+</div>
+</div>
+<footer>彩虹數字 × 水晶手鍊客製化工具 ✦ 僅供諮詢參考使用</footer>
+<div id="print-area"></div>
+
+<script>
+var currentAnalysis = null;
+var CD = {
+  1:{e:'🔴',t:'獨立・領袖',col:'#C84040',stones:[
+    {name:'紅膠花',col:'#D45060',desc:'促進情感療癒，招財運與桃花，提升靈性，增強自信心'},
+    {name:'石榴石',col:'#8B1A1A',desc:'促進血液循環，提升活力與勇氣，增強保護能量'},
+    {name:'金曜石',col:'#3A3028',desc:'反射負面能量，增強領袖魅力，改善人際關係，招財與好運'},
+    {name:'茶晶',col:'#7A5C3A',desc:'吸收負能量，改善睡眠，平和情緒，穩定財運'},
+    {name:'黑曜石',col:'#222018',desc:'吸收負能量，消除壓力與疲勞，穩定情緒'}
+  ]},
+  2:{e:'🟠',t:'合作・直覺',col:'#E07830',stones:[
+    {name:'太陽石',col:'#F4A623',desc:'增強自信心，提升正面能量，吸引豐盛與成功，招貴人'},
+    {name:'橙月光石',col:'#E8902A',desc:'鎮定情緒，增強創造力，增強自信心'},
+    {name:'月光石',col:'#C8C0B8',desc:'增強直覺與感知力，促進情感平衡，帶來柔和能量'},
+    {name:'灰月光',col:'#909090',desc:'吸收負能量，促進人際關係，提高專注力和創造力，提升靈性'},
+    {name:'石榴石',col:'#8B1A1A',desc:'促進血液循環，提升活力與勇氣，增強保護能量'}
+  ]},
+  3:{e:'💛',t:'表達・創意',col:'#E8A820',stones:[
+    {name:'黃水晶',col:'#F9CB42',desc:'旺偏財，增加事業心，療癒創傷，重建自信'},
+    {name:'檸檬晶',col:'#F0D840',desc:'招財，好人緣，紓解焦慮，增加創意力，提升個人魅力'},
+    {name:'金髮晶',col:'#D4A017',desc:'提高正財運，旺偏財，逢凶化吉，加強決策力'},
+    {name:'黃虎眼',col:'#C88020',desc:'提升自信與勇氣，招財聚財，提升事業運，保護能量'},
+    {name:'黃阿塞',col:'#E8B830',desc:'正向思考，增強自信心，聚財，旺事業'}
+  ]},
+  4:{e:'🟢',t:'穩定・務實',col:'#3A9A5A',stones:[
+    {name:'綠幽靈',col:'#3BAA70',desc:'招財，招好運，提升貴人運與事業運，療癒內心創傷'},
+    {name:'葡萄石',col:'#7AB87A',desc:'撫平過去創傷，助財運，招正財，消除負能量，增強同理心'},
+    {name:'天河石',col:'#5CAAAA',desc:'平衡身心靈能量，提升溝通能力，增強創造力，吸引財富'},
+    {name:'草莓晶',col:'#E07080',desc:'招生意緣，增加個人魅力，強化直覺，釋放負面情緒'},
+    {name:'綠草莓',col:'#50A060',desc:'招財，增強事業運，舒緩負面情緒，招人緣，淨化負能量'}
+  ]},
+  5:{e:'🌊',t:'自由・變化',col:'#3A84C4',stones:[
+    {name:'海藍寶',col:'#5BA4C8',desc:'調整與平衡能量磁場，加強溝通表達能力，提升活力和自信心'},
+    {name:'天河石',col:'#5CAAAA',desc:'平衡身心靈能量，提升溝通能力，增強創造力，吸引財富'},
+    {name:'藍晶石',col:'#4878B8',desc:'增強溝通與表達能力，提高洞察力，安穩情緒，轉換新思維'},
+    {name:'透體藍針',col:'#3468A8',desc:'擴大正面情緒，增強溝通與表達能力，提升專注力，淨化能量'},
+    {name:'灰月光',col:'#909090',desc:'吸收負能量，促進人際關係，提高專注力和創造力，提升靈性'}
+  ]},
+  6:{e:'💗',t:'愛・責任',col:'#D85880',stones:[
+    {name:'粉晶',col:'#E8A8B8',desc:'療癒創傷，開啟新戀情，增進人緣，招生意緣，增加自信'},
+    {name:'草莓晶',col:'#E07080',desc:'招生意緣，增加個人魅力，提升戀愛運，強化直覺與洞察力'},
+    {name:'藍月光石',col:'#7090C8',desc:'舒緩壓力，減輕焦慮，修復情感創傷，增進魅力，提升直覺力'},
+    {name:'堇青石',col:'#6878A8',desc:'改掉壞習慣，改善人際關係，生活自律，提高專注力，增強意志力'},
+    {name:'灰月光',col:'#909090',desc:'吸收負能量，促進人際關係，提高專注力和創造力，提升靈性'}
+  ]},
+  7:{e:'🔮',t:'智慧・靈性',col:'#7850B0',stones:[
+    {name:'紫水晶',col:'#9370B8',desc:'專注思考，開發智慧與潛能，廣結人緣，貴人相助，鎮定情緒'},
+    {name:'紫鋰輝',col:'#C090C0',desc:'療癒過去傷痛，消除緊張壓力，增進溝通協調，喚醒心中的愛'},
+    {name:'白水晶',col:'#C8C8C8',desc:'淨化負能量，保持頭腦清晰，平衡身心靈，強化能量場，啟發靈性'},
+    {name:'藍月光石',col:'#7090C8',desc:'舒緩壓力，減輕焦慮，修復情感創傷，提升直覺力'},
+    {name:'白阿賽',col:'#E0DCD4',desc:'吸收負能量，淨化磁場，提高專注力，排解焦慮，增加正能量'}
+  ]},
+  8:{e:'🐯',t:'豐盛・力量',col:'#C07820',stones:[
+    {name:'金髮晶',col:'#D4A017',desc:'提高正財運，旺偏財，逢凶化吉，加強決策力'},
+    {name:'虎眼石',col:'#C87820',desc:'財富吸引，強化行動力，提升意志力，保護能量'},
+    {name:'茶晶',col:'#7A5C3A',desc:'吸收負能量，改善睡眠，平和情緒，穩定財運'},
+    {name:'紫鋰輝',col:'#C090C0',desc:'療癒過去傷痛，消除緊張壓力，增進溝通協調，喚醒心中的愛'}
+  ]},
+  9:{e:'🤍',t:'完成・慈悲',col:'#70A8A8',stones:[
+    {name:'白水晶',col:'#C8C8C8',desc:'淨化負能量，保持頭腦清晰，平衡身心靈，強化能量場，啟發靈性'},
+    {name:'藍月光石',col:'#7090C8',desc:'舒緩壓力，減輕焦慮，修復情感創傷，提升直覺力'},
+    {name:'白阿賽',col:'#E0DCD4',desc:'吸收負能量，淨化磁場，提高專注力，排解焦慮，增加正能量'},
+    {name:'紫鋰輝',col:'#C090C0',desc:'療癒過去傷痛，消除緊張壓力，增進溝通協調，喚醒心中的愛'}
+  ]}
+};
+
+var MDESC = {
+  11:'超強直覺與靈性感知，是命數 2 中能量最強的',
+  22:'大師建造者，將夢想落地實現的強大執行力',
+  33:'大師療癒者，無條件的愛與奉獻，慈悲能量極強'
+};
+var LUCKY_UNIT = [1,4,1,3,1,1];
+
+function dsum(n){while(n>9){var s=0,str=String(n);for(var i=0;i<str.length;i++)s+=parseInt(str[i]);n=s;}return n;}
+function getDigits(y,m,d){var s=new Set(),str=String(y)+String(m)+String(d);for(var i=0;i<str.length;i++){var n=parseInt(str[i]);if(n>=1&&n<=9)s.add(n);}return s;}
+function calcLife(y,m,d){
+  var str=String(y)+('0'+m).slice(-2)+('0'+d).slice(-2),total=0;
+  for(var i=0;i<str.length;i++)total+=parseInt(str[i]);
+  var isMaster=(total===11||total===22||total===33);
+  var transit=(total>=10)?total:null;
+  var finalNum=dsum(total);
+  var nums=new Set();
+  if(transit!==null){var ts=String(transit);for(var i=0;i<ts.length;i++){var n=parseInt(ts[i]);if(n>=1)nums.add(n);}}
+  nums.add(finalNum);
+  return{transit:transit,final:finalNum,isMaster:isMaster,masterNum:isMaster?total:null,nums:nums};
+}
+function getLY(y,m,d){var cy=new Date().getFullYear(),total=d+m,ys=String(cy);for(var i=0;i<ys.length;i++)total+=parseInt(ys[i]);return dsum(total);}
+
+function renderYangGrid(yangDigits,ly,masterNums){
+  var el=document.getElementById('yang-grid'),html='';
+  for(var i=1;i<=9;i++){
+    var has=yangDigits.has(i),ily=(i===ly),im=masterNums.has(i);
+    var cls='nc ';
+    if(has)cls+='nc-yang-has';
+    else cls+='nc-yang-miss';
+    if(im)cls+=' nc-master';
+    var masterStar=im?'<span style="position:absolute;top:-4px;right:-3px;font-size:8px;color:#C84040">★</span>':'';
+    var lyStar=ily?'<span style="position:absolute;bottom:-4px;right:-3px;font-size:8px;color:#0F6E56">★</span>':'';
+    html+='<div class="'+cls+'">'+i+masterStar+lyStar+'</div>';
+  }
+  el.innerHTML=html;
+}
+function renderYinGrid(yinDigits,ly,masterNums,hasLunar){
+  var el=document.getElementById('yin-grid'),html='';
+  for(var i=1;i<=9;i++){
+    var has=yinDigits.has(i),ily=(i===ly),im=masterNums.has(i);
+    var cls='nc ';
+    if(!hasLunar)cls+='nc-yin-miss';
+    else if(has)cls+='nc-yin-has';
+    else cls+='nc-yin-miss';
+    if(im&&hasLunar)cls+=' nc-master';
+    var masterStar=(im&&hasLunar)?'<span style="position:absolute;top:-4px;right:-3px;font-size:8px;color:#3B5BA5">★</span>':'';
+    var lyStar=ily?'<span style="position:absolute;bottom:-4px;right:-3px;font-size:8px;color:#0F6E56">★</span>':'';
+    html+='<div class="'+cls+'">'+i+masterStar+lyStar+'</div>';
+  }
+  el.innerHTML=html;
+}
+
+function makeCard(n,type,masterNum,isTop){
+  var cd=CD[n];
+  var tagCls={master:'tg-m',both:'tg-b',yang:'tg-y',yin:'tg-n',ly:'tg-l',spare:'tg-s'};
+  var tagLbl={master:masterNum?'大師數 '+masterNum+'/'+n:'主命數 '+n,both:'陰陽皆缺',yang:'外在缺',yin:'內在缺',ly:'流年',spare:'備選'};
+  var sub={
+    master:masterNum?'大師數能量，比一般命數 '+n+' 更強':'命數核心，此生最重要的能量課題',
+    both:'內外兩個面向皆薄弱，配戴優先度最高',
+    yang:'外在表現上較難展現此數字特質',
+    yin:'內心深層感受到此能量的匱乏',
+    ly:'今年流年功課，建議配戴強化',
+    spare:'可加強補充的能量'
+  };
+  var stonesHtml='<div class="stone-list">';
+  cd.stones.forEach(function(s){
+    stonesHtml+='<label class="stone-item" style="border-left-color:'+s.col+'">'+
+      '<div style="display:flex;align-items:flex-start;gap:8px;">'+
+      '<input type="checkbox" class="stone-checkbox" data-n="'+n+'" data-name="'+s.name+'" data-desc="'+s.desc+'" data-col="'+s.col+'" style="margin-top:3px;flex-shrink:0;width:14px;height:14px;accent-color:#0F6E56;cursor:pointer;">'+
+      '<div style="flex:1">'+
+      '<div class="stone-name">'+s.name+'</div>'+
+      '<div class="stone-desc">'+s.desc+'</div>'+
+      '</div></div>'+
+      '</label>';
+  });
+  stonesHtml+='</div>';
+  return '<div class="crow'+(isTop?' top':'')+'">'+
+    '<div class="cicon" style="background:'+cd.col+'22;border:1.5px solid '+cd.col+'">'+cd.e+'</div>'+
+    '<div style="flex:1">'+
+    '<div class="cname">數字'+n+'｜'+cd.t+'<span class="tag '+tagCls[type]+'">'+tagLbl[type]+'</span></div>'+
+    '<div class="csub">'+sub[type]+'</div>'+
+    stonesHtml+
+    '</div></div>';
+}
+
+function buildBracelet(crystalList,targetCount){
+  var unitLen=0;
+  for(var i=0;i<LUCKY_UNIT.length;i++)unitLen+=LUCKY_UNIT[i];
+  var bestCycles=Math.max(1,Math.round(targetCount/unitLen));
+  for(var t=0;t<15;t++){
+    var wc=bestCycles>1?Math.floor((bestCycles-1)/Math.ceil(bestCycles/2)):0;
+    var tot=bestCycles*unitLen+wc;
+    if(tot>targetCount+5&&bestCycles>1)bestCycles--;
+    else if(tot<targetCount-5)bestCycles++;
+    else break;
+  }
+  var whitePeriod=Math.ceil(bestCycles/2);
+  var whiteCount=bestCycles>1?Math.floor((bestCycles-1)/whitePeriod):0;
+  var oneSlot=crystalList.slice(2),oneIdx=0,sequence=[];
+  for(var c=0;c<bestCycles;c++){
+    if(c>0&&whitePeriod>0&&c%whitePeriod===0)
+      sequence.push({type:'white',col:'#C8C0B8',name:'白水晶'});
+    for(var u=0;u<LUCKY_UNIT.length;u++){
+      var count=LUCKY_UNIT[u],crystal;
+      if(count===4)crystal=crystalList[0];
+      else if(count===3)crystal=crystalList.length>1?crystalList[1]:crystalList[0];
+      else{crystal=oneSlot.length>0?oneSlot[oneIdx++%oneSlot.length]:crystalList[0];}
+      for(var k=0;k<count;k++)sequence.push({type:'main',col:crystal.col,name:crystal.name,n:crystal.n});
+    }
+  }
+  return{sequence:sequence,cycles:bestCycles,total:sequence.length,whiteCount:whiteCount};
+}
+
+function doCalc(){
+  try{
+    var name=document.getElementById('iname').value.trim()||'客戶';
+    var gender=document.getElementById('igender').value;
+    var syVal=document.getElementById('isolar-year').value;
+    var smVal=document.getElementById('isolar-month').value;
+    var sdVal=document.getElementById('isolar-day').value;
+    var lyYearVal=document.getElementById('ily-year').value;
+    var lmVal=document.getElementById('ilm').value;
+    var ldVal=document.getElementById('ild').value;
+    var wristVal=document.getElementById('iwrist').value;
+    var lynumVal=document.getElementById('ilynum').value;
+    var focus=document.getElementById('ifocus').value;
+    if(!syVal||!smVal||!sdVal){alert('請輸入陽曆生日（年、月、日）');return;}
+    var sy=parseInt(syVal),sm=parseInt(smVal),sd=parseInt(sdVal);
+    var lm=lmVal?parseInt(lmVal):0,ld=ldVal?parseInt(ldVal):0;
+    var ly_y=lyYearVal?parseInt(lyYearVal):sy;
+    var hasLunar=(lm>0&&ld>0);
+    var wrist=wristVal?parseFloat(wristVal):0;
+    var mm=(gender==='M')?10:8;
+    var lyNum=lynumVal?parseInt(lynumVal):getLY(sy,sm,sd);
+
+    // 陽曆（獨立）
+    var yangDigits=getDigits(sy,sm,sd);
+    var solarLife=calcLife(sy,sm,sd);
+    solarLife.nums.forEach(function(n){yangDigits.add(n);});
+    var solarMasterNums=new Set();
+    if(solarLife.isMaster){
+      var ms=String(solarLife.masterNum);
+      for(var i=0;i<ms.length;i++){var mn=parseInt(ms[i]);if(mn>=1)solarMasterNums.add(mn);}
+      solarMasterNums.add(solarLife.final);
+    }
+
+    // 陰曆（獨立）
+    var yinDigits=new Set(),lunarLife=null,lunarMasterNums=new Set();
+    if(hasLunar){
+      yinDigits=getDigits(ly_y,lm,ld);
+      lunarLife=calcLife(ly_y,lm,ld);
+      lunarLife.nums.forEach(function(n){yinDigits.add(n);});
+      if(lunarLife.isMaster){
+        var ms2=String(lunarLife.masterNum);
+        for(var i=0;i<ms2.length;i++){var mn2=parseInt(ms2[i]);if(mn2>=1)lunarMasterNums.add(mn2);}
+        lunarMasterNums.add(lunarLife.final);
+      }
+    }
+
+    renderYangGrid(yangDigits,lyNum,solarMasterNums);
+    renderYinGrid(yinDigits,lyNum,lunarMasterNums,hasLunar);
+
+    // 命數顯示
+    var yls=solarLife.isMaster?'大師數 '+solarLife.masterNum+'/'+solarLife.final+'（'+CD[solarLife.final].t+'）':((solarLife.transit?solarLife.transit+'/':'')+solarLife.final+'（'+CD[solarLife.final].t+'）');
+    document.getElementById('yang-life').innerHTML='命數：<strong>'+yls+'</strong>';
+    if(hasLunar&&lunarLife){
+      var yns=lunarLife.isMaster?'大師數 '+lunarLife.masterNum+'/'+lunarLife.final+'（'+CD[lunarLife.final].t+'）':((lunarLife.transit?lunarLife.transit+'/':'')+lunarLife.final+'（'+CD[lunarLife.final].t+'）');
+      document.getElementById('yin-life').innerHTML='命數：<strong>'+yns+'</strong>';
+    } else {
+      document.getElementById('yin-life').textContent='（尚未輸入陰曆生日）';
+    }
+
+    // 大師數提示
+    var masterHtml='';
+    if(solarLife.isMaster)masterHtml+='<div class="master-box master-yang">★ <strong>'+name+' 的陽曆主命數是大師數 '+solarLife.masterNum+'/'+solarLife.final+'</strong><br>'+MDESC[solarLife.masterNum]+'。這個 '+solarLife.final+' 的能量遠比一般命數更強，諮詢時可特別說明。</div>';
+    if(hasLunar&&lunarLife&&lunarLife.isMaster)masterHtml+='<div class="master-box master-yin">★ <strong>'+name+' 的陰曆主命數也是大師數 '+lunarLife.masterNum+'/'+lunarLife.final+'</strong><br>'+MDESC[lunarLife.masterNum]+'（陰曆內在層次）。</div>';
+    document.getElementById('master-area').innerHTML=masterHtml;
+
+    // 摘要
+    document.getElementById('sumbox').innerHTML=
+      '<strong>'+name+'</strong>｜☀️ 陽曆 '+sy+'/'+sm+'/'+sd+'　🌙 '+(hasLunar?'陰曆 '+ly_y+'/'+lm+'/'+ld:'陰曆（未輸入）')+'<br>'+
+      '今年流年：<span class="hl">'+lyNum+'（'+CD[lyNum].t+'）</span>';
+
+    // 缺數分析
+    var missBoth=[],missYang=[],missYin=[];
+    for(var i=1;i<=9;i++){
+      var inY=yangDigits.has(i),inN=hasLunar?yinDigits.has(i):true;
+      if(!inY&&!inN&&hasLunar)missBoth.push(i);
+      else if(!inY)missYang.push(i);
+      else if(!inN&&hasLunar)missYin.push(i);
+    }
+    var allHave=new Set();
+    yangDigits.forEach(function(n){allHave.add(n);});
+    yinDigits.forEach(function(n){allHave.add(n);});
+    var lifeIsMiss=!allHave.has(solarLife.final);
+
+    var chipsHtml='';
+    if(lifeIsMiss){
+      var ll=solarLife.isMaster?'大師數 '+solarLife.masterNum+'/'+solarLife.final+' 缺':((solarLife.transit?solarLife.transit+'/':'')+solarLife.final+' 缺');
+      chipsHtml+='<span class="chip ch-master">'+ll+'</span>';
+    }
+    missBoth.forEach(function(n){if(n!==solarLife.final)chipsHtml+='<span class="chip ch-both">數字'+n+' 內外皆缺</span>';});
+    chipsHtml+='<span class="chip ch-ly">流年 '+lyNum+'（'+CD[lyNum].t+'）</span>';
+    if(focus!=='yin')missYang.forEach(function(n){if(n!==solarLife.final&&missBoth.indexOf(n)<0)chipsHtml+='<span class="chip ch-yang">數字'+n+' 外在缺</span>';});
+    if(focus!=='yang')missYin.forEach(function(n){if(n!==solarLife.final&&missBoth.indexOf(n)<0)chipsHtml+='<span class="chip ch-yin">數字'+n+' 內在缺</span>';});
+    if(!chipsHtml)chipsHtml='<span style="font-size:12px;color:var(--text2)">數字能量完整，可依喜好選石。</span>';
+    document.getElementById('miss-chips').innerHTML=chipsHtml;
+
+    // 優先順序（主推薦最多3個）
+    var priority=[];
+    if(lifeIsMiss)priority.push({n:solarLife.final,type:'master',mn:solarLife.isMaster?solarLife.masterNum:null});
+    missBoth.forEach(function(n){if(priority.length<3&&!priority.find(function(p){return p.n===n;}))priority.push({n:n,type:'both',mn:null});});
+    if(priority.length<3&&!priority.find(function(p){return p.n===lyNum;}))priority.push({n:lyNum,type:'ly',mn:null});
+
+    // 備選最多3個
+    var spare=[],usedNums=priority.map(function(p){return p.n;});
+    if(focus!=='yin')missYang.forEach(function(n){if(usedNums.indexOf(n)<0&&!spare.find(function(p){return p.n===n;})&&spare.length<3)spare.push({n:n,type:'yang'});});
+    if(focus!=='yang')missYin.forEach(function(n){if(usedNums.indexOf(n)<0&&!spare.find(function(p){return p.n===n;})&&spare.length<3)spare.push({n:n,type:'yin'});});
+    missBoth.forEach(function(n){if(usedNums.indexOf(n)<0&&!spare.find(function(p){return p.n===n;})&&spare.length<3)spare.push({n:n,type:'both'});});
+    for(var i=1;i<=9&&spare.length<3;i++){
+      if(usedNums.indexOf(i)<0&&!spare.find(function(p){return p.n===i;}))
+        spare.push({n:i,type:'spare'});
+    }
+
+    document.getElementById('crystal-main').innerHTML=priority.length
+      ?priority.map(function(p,i){return makeCard(p.n,p.type,p.mn,i===0);}).join('')
+      :'<div style="font-size:12px;color:var(--text2);padding:8px">數字能量完整，可依喜好或流年選石。</div>';
+
+    var spareHtml='';
+    if(spare.length>0){
+      spareHtml='<div class="spare-title">備選參考（'+spare.length+' 種）</div>';
+      spare.forEach(function(p){spareHtml+=makeCard(p.n,p.type,null,false);});
+    }
+    document.getElementById('crystal-spare').innerHTML=spareHtml;
+
+    // 手鍊水晶清單
+    var crystalList=[],allPicks=priority.concat(spare);
+    allPicks.forEach(function(p){
+      var cd=CD[p.n];
+      if(cd.stones&&cd.stones.length>0){
+        var si=(p.type==='yin')?Math.min(1,cd.stones.length-1):0;
+        crystalList.push({n:p.n,col:cd.stones[si].col,name:cd.stones[si].name});
+      }
+    });
+    if(crystalList.length===0){var cd0=CD[lyNum];crystalList.push({n:lyNum,col:cd0.stones[0].col,name:cd0.stones[0].name});}
+    if(crystalList.length===1){var cd1=CD[lyNum];crystalList.push({n:lyNum,col:cd1.col,name:cd1.t});}
+
+    var targetCount=wrist>0?Math.round((wrist+1)/(mm/10)):20;
+    var result=buildBracelet(crystalList,targetCount);
+
+    var bsz=mm>=10?34:30,beadHtml='';
+    result.sequence.forEach(function(b){beadHtml+='<div class="bead" style="width:'+bsz+'px;height:'+bsz+'px;background:'+b.col+'" title="'+b.name+'">'+b.name.slice(0,2)+'</div>';});
+    document.getElementById('bracelet').innerHTML=beadHtml;
+
+    var legendMap={};
+    result.sequence.forEach(function(b){if(!legendMap[b.name])legendMap[b.name]={col:b.col,count:0};legendMap[b.name].count++;});
+    var legendHtml='';
+    Object.keys(legendMap).forEach(function(name){legendHtml+='<div class="bl-item"><div class="bl-dot" style="background:'+legendMap[name].col+'"></div>'+name+' × '+legendMap[name].count+'顆</div>';});
+    document.getElementById('bracelet-legend').innerHTML=legendHtml;
+    document.getElementById('pattern-info').textContent='好運串法：14→41→13→31→11 循環 '+result.cycles+' 圈｜總珠數 '+result.total+' 顆｜白水晶 '+result.whiteCount+' 顆點綴';
+    document.getElementById('bead-info').innerHTML=
+      '<div class="binfo"><div class="binfo-num">'+result.total+'</div><div class="binfo-lbl">總珠數</div></div>'+
+      '<div class="binfo"><div class="binfo-num">'+result.cycles+'</div><div class="binfo-lbl">循環圈數</div></div>'+
+      '<div class="binfo"><div class="binfo-num">'+mm+'mm</div><div class="binfo-lbl">珠徑</div></div>'+
+      '<div class="binfo"><div class="binfo-num">'+(wrist>0?wrist+'cm':'—')+'</div><div class="binfo-lbl">手圍</div></div>';
+
+    currentAnalysis = {
+      name:name, sy:sy, sm:sm, sd:sd,
+      ly_y:ly_y, lm:lm, ld:ld, hasLunar:hasLunar,
+      lyNum:lyNum, wrist:wrist, mm:mm,
+      solarLife:solarLife, lunarLife:lunarLife,
+      yangDigits:yangDigits, yinDigits:yinDigits,
+      solarMasterNums:solarMasterNums, lunarMasterNums:lunarMasterNums,
+      priority:priority, spare:spare,
+      defaultCrystalList:crystalList.slice(), targetCount:targetCount,
+      braceletSeq:result.sequence, braceletCycles:result.cycles, braceletTotal:result.total
+    };
+    document.getElementById('msg-card').style.display = 'block';
+    document.getElementById('msg-label').textContent = '給 ' + name + ' 的一句話';
+    document.getElementById('result').classList.remove('hidden');
+    document.getElementById('result').scrollIntoView({behavior:'smooth',block:'start'});
+  }catch(e){alert('發生錯誤：'+e.message);}
+}
+
+function buildPrintHtml(a, stones, msg) {
+  var today = new Date();
+  var dateStr = today.getFullYear()+'/'+(today.getMonth()+1)+'/'+today.getDate();
+
+  function miniGrid(digits, masterNums, ly, scheme) {
+    var hasBg  = scheme==='yang'?'#FAEEDA':'#D8E6FF';
+    var hasCol = scheme==='yang'?'#633806':'#1E3A7A';
+    var hasBdr = scheme==='yang'?'#BA7517':'#3B5BA5';
+    var mCol   = scheme==='yang'?'#C84040':'#3B5BA5';
+    var h='<div style="display:grid;grid-template-columns:repeat(3,20px);gap:3px;width:fit-content;margin:0 auto;">';
+    for(var i=1;i<=9;i++){
+      var has=digits&&digits.has(i), ily=i===ly, im=masterNums&&masterNums.has(i);
+      var bg  = has ? hasBg  : '#f0ede6';
+      var col = has ? hasCol : '#c0bdb5';
+      var bdr = has ? hasBdr : '#dedad2';
+      var bw  = has ? '2px'  : '1px';
+      h+='<div style="background:'+bg+';border:'+bw+' solid '+bdr+';border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:'+col+';position:relative;flex-shrink:0;">';
+      h+=i;
+      if(im)h+='<span style="position:absolute;top:-3px;right:-2px;font-size:6px;color:'+mCol+'">★</span>';
+      if(ily)h+='<span style="position:absolute;bottom:-3px;right:-2px;font-size:6px;color:#0F6E56">★</span>';
+      h+='</div>';
+    }
+    return h+'</div>';
+  }
+
+  var yls=a.solarLife.isMaster
+    ?'大師數 '+a.solarLife.masterNum+'/'+a.solarLife.final+'（'+CD[a.solarLife.final].t+'）'
+    :((a.solarLife.transit?a.solarLife.transit+'/':'')+a.solarLife.final+'（'+CD[a.solarLife.final].t+'）');
+  var yns='';
+  if(a.hasLunar&&a.lunarLife)
+    yns=a.lunarLife.isMaster
+      ?'大師數 '+a.lunarLife.masterNum+'/'+a.lunarLife.final+'（'+CD[a.lunarLife.final].t+'）'
+      :((a.lunarLife.transit?a.lunarLife.transit+'/':'')+a.lunarLife.final+'（'+CD[a.lunarLife.final].t+'）');
+
+  var typeLbl={master:'命數缺失',both:'陰陽皆缺',yang:'外在面向缺',yin:'內在面向缺',ly:'今年流年',spare:'補充能量'};
+  var typeCol={master:'#C84040',both:'#7A6AA0',yang:'#BA7517',yin:'#3B5BA5',ly:'#0F6E56',spare:'#9c9a92'};
+  var allPicks=(a.priority||[]).concat(a.spare||[]);
+  var numTypeMap={};
+  allPicks.forEach(function(p){ numTypeMap[p.n]=p.type; });
+
+  var stonesHtml;
+  if(stones.length===0){
+    stonesHtml='<div style="font-size:10px;color:#9c9a92;">（未勾選水晶）</div>';
+  } else {
+    // Group by number, keep order of first appearance
+    var groups=[], groupMap={};
+    stones.forEach(function(s){
+      if(!groupMap[s.n]){
+        var type=numTypeMap[s.n]||'spare';
+        var cd=CD[s.n];
+        groupMap[s.n]={n:s.n,type:type,cd:cd,items:[]};
+        groups.push(groupMap[s.n]);
+      }
+      groupMap[s.n].items.push(s);
+    });
+    stonesHtml=groups.map(function(g){
+      var tc=typeCol[g.type]||'#9c9a92';
+      var tl=typeLbl[g.type]||'補充能量';
+      var header='<div style="display:flex;align-items:center;gap:5px;margin-bottom:4px;">'
+        +'<span style="font-size:13px;line-height:1;">'+g.cd.e+'</span>'
+        +'<span style="font-size:10px;font-weight:700;color:#1a1a18;">數字 '+g.n+'　'+g.cd.t+'</span>'
+        +'<span style="font-size:8px;font-weight:700;color:'+tc+';background:'+tc+'15;border:1px solid '+tc+'44;border-radius:8px;padding:1px 6px;flex-shrink:0;">'+tl+'</span>'
+        +'</div>';
+      var items=g.items.map(function(s){
+        return '<div style="display:flex;align-items:baseline;gap:5px;padding:2px 0 2px 8px;border-left:2px solid '+s.col+';margin-bottom:2px;">'
+          +'<span style="font-size:9.5px;font-weight:700;color:#1a1a18;white-space:nowrap;">'+s.name+'</span>'
+          +'<span style="font-size:8.5px;color:#5f5e5a;line-height:1.4;">'+s.desc+'</span>'
+          +'</div>';
+      }).join('');
+      return '<div style="border:1px solid #e8e5dc;border-radius:7px;padding:6px 8px;margin-bottom:5px;">'+header+items+'</div>';
+    }).join('');
+  }
+
+  var beadHtml='<div style="display:flex;flex-wrap:wrap;gap:3px;margin-top:5px;">';
+  a.braceletSeq.forEach(function(b){
+    beadHtml+='<div style="width:13px;height:13px;border-radius:50%;background:'+b.col+';border:1px solid rgba(0,0,0,0.12);flex-shrink:0;" title="'+b.name+'"></div>';
+  });
+  beadHtml+='</div>';
+
+  var legendHtml='<div style="display:flex;flex-wrap:wrap;gap:6px;font-size:8.5px;color:#5f5e5a;margin:5px 0 6px;">'
+    +'<span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#FAEEDA;border:1px solid #BA7517;margin-right:2px;vertical-align:middle;"></span>陽曆具備</span>'
+    +'<span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#D8E6FF;border:1px solid #3B5BA5;margin-right:2px;vertical-align:middle;"></span>陰曆具備</span>'
+    +'<span style="color:#0F6E56;">★ 流年</span>'
+    +(a.solarLife.isMaster?'<span style="color:#C84040;">★ 陽曆大師數</span>':'')
+    +(a.hasLunar&&a.lunarLife&&a.lunarLife.isMaster?'<span style="color:#3B5BA5;">★ 陰曆大師數</span>':'')
+    +'</div>';
+
+  function secTitle(label) {
+    return '<div style="display:flex;align-items:center;gap:6px;margin:5px 0 5px;">'
+      +'<div style="flex:1;height:0.5px;background:#d4d0c8;"></div>'
+      +'<div style="font-size:8px;font-weight:700;color:#b0aea6;letter-spacing:0.12em;white-space:nowrap;">'+label+'</div>'
+      +'<div style="flex:1;height:0.5px;background:#d4d0c8;"></div>'
+      +'</div>';
+  }
+
+  return '<div style="font-family:\'JinXuan\',-apple-system,BlinkMacSystemFont,\'Noto Sans TC\',sans-serif;color:#1a1a18;font-size:11px;line-height:1.5;">'
+    // 標題區
+    +'<div style="text-align:center;padding:6px 0 6px;margin-bottom:8px;border-bottom:1.5px solid #c8c4b8;">'
+    +'<div style="font-size:5px;letter-spacing:0.4em;color:#9c9a92;margin-bottom:3px;">✦ ✦ ✦</div>'
+    +'<div style="font-size:16px;font-weight:800;letter-spacing:0.04em;color:#1a1a18;">彩虹數字 × 水晶手鍊</div>'
+    +'<div style="font-size:8.5px;color:#9c9a92;margin-top:2px;letter-spacing:0.06em;">客製化分析報告　'+dateStr+'</div>'
+    +'</div>'
+    // 客戶資訊
+    +'<div style="display:grid;grid-template-columns:auto 1fr;background:#f7f6f2;border-radius:8px;overflow:hidden;margin-bottom:8px;">'
+    +'<div style="background:#0F6E56;padding:7px 10px;display:flex;align-items:center;justify-content:center;">'
+    +'<div style="font-size:15px;font-weight:800;color:#fff;writing-mode:vertical-rl;letter-spacing:0.08em;">'+a.name+'</div>'
+    +'</div>'
+    +'<div style="padding:6px 10px;display:flex;flex-direction:column;justify-content:center;gap:2px;">'
+    +'<div style="font-size:9.5px;color:#3a3a38;">☀️ 陽曆　'+a.sy+'/'+a.sm+'/'+a.sd+'　　🌙 陰曆　'+(a.hasLunar?a.ly_y+'/'+a.lm+'/'+a.ld:'未輸入')+'</div>'
+    +'<div style="font-size:9.5px;color:#3a3a38;">今年流年 <strong style="color:#0F6E56;">'+a.lyNum+' — '+CD[a.lyNum].t+'</strong>　　手圍 '+(a.wrist>0?a.wrist+'cm':'未填')+'　珠徑 '+a.mm+'mm</div>'
+    +'</div>'
+    +'</div>'
+    // 九宮格
+    +secTitle('數字盤')
+    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:3px;">'
+    +'<div style="background:#FFF9EE;border:1.5px solid #BA7517;border-radius:8px;padding:7px;text-align:center;">'
+    +'<div style="font-size:9px;font-weight:700;color:#633806;margin-bottom:5px;">☀️ 陽曆 — 外在</div>'
+    +miniGrid(a.yangDigits,a.solarMasterNums,a.lyNum,'yang')
+    +'<div style="font-size:8.5px;color:#633806;margin-top:4px;">命數：<strong>'+yls+'</strong></div>'
+    +'</div>'
+    +'<div style="background:#EEF4FF;border:1.5px solid #3B5BA5;border-radius:8px;padding:7px;text-align:center;">'
+    +'<div style="font-size:9px;font-weight:700;color:#1E3A7A;margin-bottom:5px;">🌙 陰曆 — 內在</div>'
+    +(a.hasLunar?miniGrid(a.yinDigits,a.lunarMasterNums,a.lyNum,'yin'):'<div style="display:grid;grid-template-columns:repeat(3,20px);gap:3px;width:fit-content;margin:0 auto;">'+[1,2,3,4,5,6,7,8,9].map(function(){return '<div style="border-radius:50%;width:20px;height:20px;background:#f0ede6;border:1px solid #dedad2;"></div>';}).join('')+'</div>')
+    +(a.hasLunar&&yns?'<div style="font-size:8.5px;color:#1E3A7A;margin-top:4px;text-align:center;">命數：<strong>'+yns+'</strong></div>':'')
+    +'</div>'
+    +'</div>'
+    +legendHtml
+    // 已選水晶
+    +secTitle('已選水晶配置')
+    +'<div style="margin-bottom:7px;">'+stonesHtml+'</div>'
+    // 給客戶的一句話
+    +(msg ? secTitle('給 '+a.name+' 的話')
+      +'<div style="background:#fdfcf7;border:1px dashed #c8c4b8;border-radius:7px;padding:7px 11px;font-size:10px;color:#3a3a38;line-height:1.8;margin-bottom:7px;white-space:pre-wrap;">'+msg.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')+'</div>'
+      : '')
+    // Footer
+    +'<div style="text-align:center;font-size:8px;color:#c0bdb5;margin-top:8px;padding-top:6px;border-top:0.5px solid #dedad2;letter-spacing:0.06em;">彩虹數字 × 水晶手鍊　✦　僅供諮詢參考使用</div>'
+    +'</div>';
+}
+
+function doPrint() {
+  if (!currentAnalysis) { alert('請先執行分析'); return; }
+  var stones = [];
+  document.querySelectorAll('.stone-checkbox:checked').forEach(function(cb) {
+    stones.push({ n: parseInt(cb.dataset.n), name: cb.dataset.name, desc: cb.dataset.desc, col: cb.dataset.col });
+  });
+  if (stones.length === 0 && !confirm('尚未勾選任何水晶，仍要輸出嗎？')) return;
+  var msg = document.getElementById('imsg').value.trim();
+  document.getElementById('print-area').innerHTML = buildPrintHtml(currentAnalysis, stones, msg);
+  window.print();
+}
+
+function updateBraceletFromChecked() {
+  if (!currentAnalysis) return;
+  var checked = [];
+  document.querySelectorAll('.stone-checkbox:checked').forEach(function(cb) {
+    checked.push({ n: parseInt(cb.dataset.n), col: cb.dataset.col, name: cb.dataset.name });
+  });
+  var crystalList = checked.length > 0 ? checked : currentAnalysis.defaultCrystalList.slice();
+  if (crystalList.length === 0) return;
+  var result = buildBracelet(crystalList, currentAnalysis.targetCount);
+  var mm = currentAnalysis.mm, bsz = mm >= 10 ? 34 : 30, beadHtml = '';
+  result.sequence.forEach(function(b) {
+    beadHtml += '<div class="bead" style="width:'+bsz+'px;height:'+bsz+'px;background:'+b.col+'" title="'+b.name+'">'+b.name.slice(0,2)+'</div>';
+  });
+  document.getElementById('bracelet').innerHTML = beadHtml;
+  var legendMap = {};
+  result.sequence.forEach(function(b) { if(!legendMap[b.name]) legendMap[b.name]={col:b.col,count:0}; legendMap[b.name].count++; });
+  var legendHtml = '';
+  Object.keys(legendMap).forEach(function(name) { legendHtml += '<div class="bl-item"><div class="bl-dot" style="background:'+legendMap[name].col+'"></div>'+name+' × '+legendMap[name].count+'顆</div>'; });
+  document.getElementById('bracelet-legend').innerHTML = legendHtml;
+  document.getElementById('pattern-info').textContent = '好運串法：14→41→13→31→11 循環 '+result.cycles+' 圈｜總珠數 '+result.total+' 顆｜白水晶 '+result.whiteCount+' 顆點綴';
+  document.getElementById('bead-info').innerHTML =
+    '<div class="binfo"><div class="binfo-num">'+result.total+'</div><div class="binfo-lbl">總珠數</div></div>'+
+    '<div class="binfo"><div class="binfo-num">'+result.cycles+'</div><div class="binfo-lbl">循環圈數</div></div>'+
+    '<div class="binfo"><div class="binfo-num">'+mm+'mm</div><div class="binfo-lbl">珠徑</div></div>'+
+    '<div class="binfo"><div class="binfo-num">'+(currentAnalysis.wrist>0?currentAnalysis.wrist+'cm':'—')+'</div><div class="binfo-lbl">手圍</div></div>';
+  currentAnalysis.braceletSeq = result.sequence;
+  currentAnalysis.braceletCycles = result.cycles;
+  currentAnalysis.braceletTotal = result.total;
+  var countEl = document.getElementById('stone-count');
+  if (countEl) countEl.textContent = checked.length > 0 ? '✓ 已選 '+checked.length+' 顆' : '';
+}
+
+function sw(t){
+  ['calc','ref','how'].forEach(function(id){document.getElementById('tab-'+id).classList.toggle('hidden',id!==t);});
+  document.querySelectorAll('.tab').forEach(function(el,i){el.classList.toggle('active',['calc','ref','how'][i]===t);});
+}
+document.getElementById('calcbtn').addEventListener('click',doCalc);
+document.addEventListener('change', function(e) {
+  if (e.target.classList.contains('stone-checkbox')) updateBraceletFromChecked();
+});
+</script>
+</body>
+</html>
