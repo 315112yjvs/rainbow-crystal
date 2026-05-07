@@ -962,7 +962,8 @@ function buildPrintHtml(a, stones, msg, withLogo) {
     // 客戶資訊
     +'<div style="display:grid;grid-template-columns:auto 1fr;background:#f7f6f2;border-radius:8px;overflow:hidden;margin-bottom:8px;">'
     +'<div style="background:#0F6E56;padding:7px 10px;display:flex;align-items:center;justify-content:center;">'
-    +'<div style="font-size:15px;font-weight:800;color:#fff;writing-mode:vertical-rl;letter-spacing:0.08em;">'+a.name+'</div>'
+    +(function(){var isLatin=/^[\x00-\x7F]+$/.test(a.name);if(isLatin){var fs=a.name.length<=2?'14px':a.name.length<=4?'11px':'9px';return '<div style="font-size:'+fs+';font-weight:800;color:#fff;text-align:center;max-width:34px;word-break:break-all;line-height:1.2;">'+a.name+'</div>';}return '<div style="font-size:15px;font-weight:800;color:#fff;writing-mode:vertical-rl;letter-spacing:0.08em;">'+a.name+'</div>';})()
+
     +'</div>'
     +'<div style="padding:6px 10px;display:flex;flex-direction:column;justify-content:center;gap:2px;">'
     +'<div style="font-size:9.5px;color:#3a3a38;">☀️ 陽曆　'+a.sy+'/'+a.sm+'/'+a.sd+'　　🌙 陰曆　'+(a.hasLunar?a.ly_y+'/'+(a.isLeap?'閏':'')+a.lm+'/'+a.ld+(a.isLeap?' (計算用'+a.calcLm+'月)':''):'未輸入')+'</div>'
@@ -989,7 +990,7 @@ function buildPrintHtml(a, stones, msg, withLogo) {
     // 位格年說明
     +secTitle('位格年')
     +'<div style="font-size:9px;color:#5f5e5a;line-height:1.75;margin-bottom:6px;">'
-    +'<div style="margin-bottom:5px;white-space:nowrap;font-size:8px;">彩虹數字流年以9年為一個周期，每個位格年都有特定的焦點和體驗：</div>'
+    +'<div style="margin-bottom:5px;white-space:nowrap;font-size:9px;">彩虹數字流年以9年為一個周期，每個位格年都有特定的焦點和體驗：</div>'
     +(a.yinPos&&a.yinPos===a.yangPos
       ?'<div style="margin-bottom:4px;padding:5px 8px;background:#f6f2ff;border-left:2.5px solid #7C5ABF;border-radius:0 4px 4px 0;">'
        +'<strong style="color:#7C5ABF;">☀️ 陽曆　🌙 陰曆　第 '+a.yangPos+' 位格年（'+PYEAR_TITLE[a.yangPos]+'）</strong><br>'
