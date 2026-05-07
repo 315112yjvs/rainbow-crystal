@@ -553,6 +553,15 @@ function buildBracelet(crystalList,targetCount){
     for(var k=0;k<actual;k++)sequence.push({type:'main',col:crystal.col,name:crystal.name,n:crystal.n});
     pos=(pos+1)%LUCKY_UNIT.length;
   }
+  // 頭尾相接時，若首尾是同種水晶，把末顆換成白水晶作分隔
+  var firstMain=sequence.find(function(b){return b.type==='main';});
+  if(firstMain&&sequence.length>1){
+    var last=sequence[sequence.length-1];
+    if(last.type==='main'&&last.name===firstMain.name){
+      sequence[sequence.length-1]={type:'white',col:'#C8C0B8',name:'白水晶'};
+      whiteCount++;
+    }
+  }
   var colored=sequence.filter(function(b){return b.type!=='white';}).length;
   var cycles=Math.max(1,Math.round(colored/11*10)/10);
   return{sequence:sequence,cycles:cycles,total:sequence.length,whiteCount:whiteCount};
@@ -717,11 +726,9 @@ function doCalc(){
     var legendHtml='';
     Object.keys(legendMap).forEach(function(name){legendHtml+='<div class="bl-item"><div class="bl-dot" style="background:'+legendMap[name].col+'"></div>'+name+' × '+legendMap[name].count+'顆</div>';});
     document.getElementById('bracelet-legend').innerHTML=legendHtml;
-    var braceletLen=(result.total*mm/10).toFixed(1);
-    document.getElementById('pattern-info').textContent='好運串法：14→41→13→31→11｜總珠數 '+result.total+' 顆｜手鍊長約 '+braceletLen+'cm｜白水晶 '+result.whiteCount+' 顆點綴';
+    document.getElementById('pattern-info').textContent='好運串法：14→41→13→31→11｜總珠數 '+result.total+' 顆｜白水晶 '+result.whiteCount+' 顆點綴';
     document.getElementById('bead-info').innerHTML=
       '<div class="binfo"><div class="binfo-num">'+result.total+'</div><div class="binfo-lbl">總珠數</div></div>'+
-      '<div class="binfo"><div class="binfo-num">'+braceletLen+'cm</div><div class="binfo-lbl">手鍊長</div></div>'+
       '<div class="binfo"><div class="binfo-num">'+mm+'mm</div><div class="binfo-lbl">珠徑</div></div>'+
       '<div class="binfo"><div class="binfo-num">'+(wrist>0?wrist+'cm':'—')+'</div><div class="binfo-lbl">手圍</div></div>';
 
@@ -854,7 +861,7 @@ function buildPrintHtml(a, stones, msg, withLogo) {
     +'</div>'
     +'<div style="padding:6px 10px;display:flex;flex-direction:column;justify-content:center;gap:2px;">'
     +'<div style="font-size:9.5px;color:#3a3a38;">☀️ 陽曆　'+a.sy+'/'+a.sm+'/'+a.sd+'　　🌙 陰曆　'+(a.hasLunar?a.ly_y+'/'+a.lm+'/'+a.ld:'未輸入')+'</div>'
-    +'<div style="font-size:9.5px;color:#3a3a38;">陽曆流年 <strong style="color:#B05000;">'+a.yangLyNum+'</strong>'+(a.yinLyNum&&a.yinLyNum!==a.yangLyNum?'　陰曆流年 <strong style="color:#3B5BA5;">'+a.yinLyNum+'</strong>':'')+'　　手圍 '+(a.wrist>0?a.wrist+'cm':'未填')+'　珠徑 '+a.mm+'mm　手鍊長 '+(a.braceletTotal*a.mm/10).toFixed(1)+'cm</div>'
+    +'<div style="font-size:9.5px;color:#3a3a38;">陽曆流年 <strong style="color:#B05000;">'+a.yangLyNum+'</strong>'+(a.yinLyNum&&a.yinLyNum!==a.yangLyNum?'　陰曆流年 <strong style="color:#3B5BA5;">'+a.yinLyNum+'</strong>':'')+'　　手圍 '+(a.wrist>0?a.wrist+'cm':'未填')+'　珠徑 '+a.mm+'mm</div>'
     +'</div>'
     +'</div>'
     // 九宮格
@@ -1003,11 +1010,10 @@ function updateBraceletFromChecked() {
   var legendHtml = '';
   Object.keys(legendMap).forEach(function(name) { legendHtml += '<div class="bl-item"><div class="bl-dot" style="background:'+legendMap[name].col+'"></div>'+name+' × '+legendMap[name].count+'顆</div>'; });
   document.getElementById('bracelet-legend').innerHTML = legendHtml;
-  var mm2=currentAnalysis.mm,braceletLen2=(result.total*mm2/10).toFixed(1);
-  document.getElementById('pattern-info').textContent = '好運串法：14→41→13→31→11｜總珠數 '+result.total+' 顆｜手鍊長約 '+braceletLen2+'cm｜白水晶 '+result.whiteCount+' 顆點綴';
+  var mm2=currentAnalysis.mm;
+  document.getElementById('pattern-info').textContent = '好運串法：14→41→13→31→11｜總珠數 '+result.total+' 顆｜白水晶 '+result.whiteCount+' 顆點綴';
   document.getElementById('bead-info').innerHTML =
     '<div class="binfo"><div class="binfo-num">'+result.total+'</div><div class="binfo-lbl">總珠數</div></div>'+
-    '<div class="binfo"><div class="binfo-num">'+braceletLen2+'cm</div><div class="binfo-lbl">手鍊長</div></div>'+
     '<div class="binfo"><div class="binfo-num">'+mm2+'mm</div><div class="binfo-lbl">珠徑</div></div>'+
     '<div class="binfo"><div class="binfo-num">'+(currentAnalysis.wrist>0?currentAnalysis.wrist+'cm':'—')+'</div><div class="binfo-lbl">手圍</div></div>';
   currentAnalysis.braceletSeq = result.sequence;
