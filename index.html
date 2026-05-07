@@ -1052,21 +1052,7 @@ function doPrint() {
     }
 
     setTimeout(function() {
-      var nodeW = 560;
-      // Shift any card that straddles a page boundary down to the next page
-      var pdfH_px = 210 * nodeW / 148;
-      var nodeTop = node.getBoundingClientRect().top;
-      node.querySelectorAll('.pdf-no-break').forEach(function(card) {
-        var rect = card.getBoundingClientRect();
-        var cardTop = rect.top - nodeTop;
-        var pageStart = Math.floor(cardTop / pdfH_px);
-        var pageEnd = Math.floor((cardTop + rect.height - 1) / pdfH_px);
-        if (pageEnd > pageStart) {
-          var extra = Math.ceil((pageStart + 1) * pdfH_px - cardTop) + 10;
-          card.style.marginTop = ((parseInt(card.style.marginTop) || 0) + extra) + 'px';
-        }
-      });
-      var nodeH = node.scrollHeight;
+      var nodeW = 560, nodeH = node.scrollHeight;
       html2canvas(node, {
         scale: 3,
         backgroundColor: '#ffffff',
@@ -1077,18 +1063,37 @@ function doPrint() {
         height: nodeH,
         windowWidth: nodeW
       }).then(function(canvas) {
-          var dataUrl = canvas.toDataURL('image/jpeg', 0.88);
+          var sc = 3;
           var jsPDF = window.jspdf.jsPDF;
           var pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a5' });
           var pdfW = pdf.internal.pageSize.getWidth();
           var pdfH = pdf.internal.pageSize.getHeight();
           var imgH = nodeH / (nodeW / pdfW);
-          var position = 0;
+          // Scan canvas rows to find white gaps for page cuts
+          var pdfH_cv = Math.round(pdfH * sc * nodeW / pdfW);
+          var searchBack = Math.round(80 * sc);
+          var ctx = canvas.getContext('2d');
+          var cw = canvas.width;
+          function isWhiteRow(y) {
+            if (y < 0 || y >= canvas.height) return true;
+            var d = ctx.getImageData(0, y, cw, 1).data;
+            for (var i = 0; i < d.length; i += 4) {
+              if (d[i] < 248 || d[i+1] < 248 || d[i+2] < 248) return false;
+            }
+            return true;
+          }
+          var dataUrl = canvas.toDataURL('image/jpeg', 0.88);
           pdf.addImage(dataUrl, 'JPEG', 0, 0, pdfW, imgH);
-          while (imgH - Math.abs(position) > pdfH) {
-            position -= pdfH;
+          var idealCut = pdfH_cv;
+          while (idealCut < canvas.height) {
+            var cut = idealCut;
+            for (var y = idealCut; y >= idealCut - searchBack; y--) {
+              if (isWhiteRow(y)) { cut = y; break; }
+            }
+            var cutMm = cut / sc * pdfW / nodeW;
             pdf.addPage();
-            pdf.addImage(dataUrl, 'JPEG', 0, position, pdfW, imgH);
+            pdf.addImage(dataUrl, 'JPEG', 0, -cutMm, pdfW, imgH);
+            idealCut = cut + pdfH_cv;
           }
           var blob = pdf.output('blob');
           var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
