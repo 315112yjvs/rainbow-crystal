@@ -884,7 +884,7 @@ function doPrint() {
   document.body.appendChild(overlay);
 
   var node = document.createElement('div');
-  node.style.cssText = 'position:fixed;top:0;left:0;width:560px;background:#fff;padding:28px;box-sizing:border-box;z-index:10000;';
+  node.style.cssText = 'position:fixed;top:0;left:-2000px;width:560px;background:#fff;padding:28px;box-sizing:border-box;z-index:10000;';
   node.innerHTML = buildPrintHtml(a, stones, msg);
   document.body.appendChild(node);
 
@@ -920,7 +920,12 @@ function doPrint() {
           pdf.addPage();
           pdf.addImage(dataUrl, 'PNG', 0, position, pdfW, imgH);
         }
-        pdf.save(filename);
+        var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+        if (isIOS) {
+          window.open(pdf.output('bloburl'), '_blank');
+        } else {
+          pdf.save(filename);
+        }
         cleanup();
       })
       .catch(function(e) {
