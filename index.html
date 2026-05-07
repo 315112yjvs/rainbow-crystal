@@ -150,8 +150,13 @@ footer { text-align: center; font-size: 11px; color: var(--text3); padding: 1.5r
     <div class="sec">客戶資料</div>
     <div class="row2">
       <div><label>客戶姓名（選填）</label><input id="iname" type="text" placeholder="例：小明"></div>
-      <div><label>性別</label>
-        <select id="igender"><option value="F">女生</option><option value="M">男生</option></select>
+      <div><label>珠徑</label>
+        <select id="imm">
+          <option value="6">6 mm</option>
+          <option value="8" selected>8 mm</option>
+          <option value="10">10 mm</option>
+          <option value="12">12 mm</option>
+        </select>
       </div>
     </div>
     <div class="row2" style="margin-bottom:6px">
@@ -183,7 +188,10 @@ footer { text-align: center; font-size: 11px; color: var(--text3); padding: 1.5r
         </select>
       </div>
     </div>
-    <button class="btn" id="calcbtn">✦ 彩虹水晶手鍊分析</button>
+    <div style="display:grid;grid-template-columns:1fr auto;gap:8px;margin-top:6px;">
+      <button class="btn" id="calcbtn" style="margin-top:0;">✦ 彩虹水晶手鍊分析</button>
+      <button class="btn" onclick="resetForm()" style="margin-top:0;background:var(--bg3);color:var(--text2);border:0.5px solid var(--border2);">重置</button>
+    </div>
   </div>
 
   <div id="result" class="hidden">
@@ -293,10 +301,22 @@ footer { text-align: center; font-size: 11px; color: var(--text3); padding: 1.5r
 </div>
 <footer>彩虹水晶手鍊客製化工具 ✦ 僅供諮詢參考使用</footer>
 <div id="print-area"></div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="html2canvas.min.js"></script>
 <script src="jspdf.umd.min.js"></script>
 <script>
 var currentAnalysis = null;
+
+function resetForm() {
+  ['iname','isolar-year','isolar-month','isolar-day','ily-year','ilm','ild','iwrist','imsg'].forEach(function(id){
+    var el=document.getElementById(id); if(el) el.value='';
+  });
+  document.getElementById('imm').value='8';
+  document.getElementById('ifocus').value='both';
+  document.getElementById('lunar-auto-hint').style.display='none';
+  document.getElementById('result').classList.add('hidden');
+  document.getElementById('master-area').innerHTML='';
+  currentAnalysis=null;
+}
 var CD = {
   1:{e:'❤️',t:'獨立・領袖',col:'#C84040',stones:[
     {name:'紅膠花',col:'#D45060',desc:'促進情感療癒，招財運與桃花，提升靈性，增強自信心'},
@@ -543,7 +563,7 @@ function buildBracelet(crystalList,targetCount){
 function doCalc(){
   try{
     var name=document.getElementById('iname').value.trim()||'客戶';
-    var gender=document.getElementById('igender').value;
+    var mm=parseInt(document.getElementById('imm').value);
     var syVal=document.getElementById('isolar-year').value;
     var smVal=document.getElementById('isolar-month').value;
     var sdVal=document.getElementById('isolar-day').value;
@@ -558,7 +578,6 @@ function doCalc(){
     var ly_y=lyYearVal?parseInt(lyYearVal):sy;
     var hasLunar=(lm>0&&ld>0);
     var wrist=wristVal?parseFloat(wristVal):0;
-    var mm=(gender==='M')?10:8;
     // 陽曆（獨立）
     var yangDigits=getDigits(sy,sm,sd);
     var solarLife=calcLife(sy,sm,sd);
