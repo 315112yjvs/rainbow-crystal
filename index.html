@@ -908,7 +908,8 @@ function buildPrintHtml(a, stones, msg, withLogo) {
       }
       groupMap[s.n].items.push(s);
     });
-    stonesHtml=groups.map(function(g){
+    var splitAt = groups.length > 4 ? 4 : -1;
+    stonesHtml=groups.map(function(g, gi){
       var tc=typeCol[g.type]||'#9c9a92';
       var tl=typeLbl[g.type]||'補充能量';
       var header='<div style="display:flex;align-items:center;gap:5px;margin-bottom:4px;">'
@@ -922,7 +923,8 @@ function buildPrintHtml(a, stones, msg, withLogo) {
           +'<span style="font-size:8.5px;color:#5f5e5a;line-height:1.4;">'+s.desc+'</span>'
           +'</div>';
       }).join('');
-      return '<div class="pdf-no-break" style="border:1px solid #e8e5dc;border-radius:7px;padding:6px 8px;margin-bottom:5px;">'+header+items+'</div>';
+      var marker = (gi === splitAt) ? '<div id="pdf-page-break" style="height:0;overflow:hidden;"></div>' : '';
+      return marker + '<div style="border:1px solid #e8e5dc;border-radius:7px;padding:6px 8px;margin-bottom:5px;">'+header+items+'</div>';
     }).join('');
   }
 
@@ -1053,6 +1055,11 @@ function doPrint() {
 
     setTimeout(function() {
       var nodeW = 560, nodeH = node.scrollHeight;
+      // Measure page-break marker position (if present) before rendering
+      var breakMarker = node.querySelector('#pdf-page-break');
+      var cutY = breakMarker
+        ? Math.round((breakMarker.getBoundingClientRect().top - node.getBoundingClientRect().top) * 3)
+        : null;
       html2canvas(node, {
         scale: 3,
         backgroundColor: '#ffffff',
@@ -1069,31 +1076,15 @@ function doPrint() {
           var pdfW = pdf.internal.pageSize.getWidth();
           var pdfH = pdf.internal.pageSize.getHeight();
           var imgH = nodeH / (nodeW / pdfW);
-          // Scan canvas rows to find white gaps for page cuts
-          var pdfH_cv = Math.round(pdfH * sc * nodeW / pdfW);
-          var searchBack = Math.round(80 * sc);
-          var ctx = canvas.getContext('2d');
-          var cw = canvas.width;
-          function isWhiteRow(y) {
-            if (y < 0 || y >= canvas.height) return true;
-            var d = ctx.getImageData(0, y, cw, 1).data;
-            for (var i = 0; i < d.length; i += 4) {
-              if (d[i] < 248 || d[i+1] < 248 || d[i+2] < 248) return false;
-            }
-            return true;
-          }
           var dataUrl = canvas.toDataURL('image/jpeg', 0.88);
           pdf.addImage(dataUrl, 'JPEG', 0, 0, pdfW, imgH);
-          var idealCut = pdfH_cv;
-          while (idealCut < canvas.height) {
-            var cut = idealCut;
-            for (var y = idealCut; y >= idealCut - searchBack; y--) {
-              if (isWhiteRow(y)) { cut = y; break; }
-            }
-            var cutMm = cut / sc * pdfW / nodeW;
+          if (cutY !== null) {
+            var cutMm = cutY / sc * pdfW / nodeW;
             pdf.addPage();
             pdf.addImage(dataUrl, 'JPEG', 0, -cutMm, pdfW, imgH);
-            idealCut = cut + pdfH_cv;
+          } else if (imgH > pdfH) {
+            var pos = -pdfH;
+            while (imgH + pos > 0) { pdf.addPage(); pdf.addImage(dataUrl, 'JPEG', 0, pos, pdfW, imgH); pos -= pdfH; }
           }
           var blob = pdf.output('blob');
           var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
