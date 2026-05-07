@@ -297,14 +297,14 @@ footer { text-align: center; font-size: 11px; color: var(--text3); padding: 1.5r
 <script>
 var currentAnalysis = null;
 var CD = {
-  1:{e:'🔴',t:'獨立・領袖',col:'#C84040',stones:[
+  1:{e:'❤️',t:'獨立・領袖',col:'#C84040',stones:[
     {name:'紅膠花',col:'#D45060',desc:'促進情感療癒，招財運與桃花，提升靈性，增強自信心'},
     {name:'石榴石',col:'#8B1A1A',desc:'促進血液循環，提升活力與勇氣，增強保護能量'},
     {name:'金曜石',col:'#3A3028',desc:'反射負面能量，增強領袖魅力，改善人際關係，招財與好運'},
     {name:'茶晶',col:'#7A5C3A',desc:'吸收負能量，改善睡眠，平和情緒，穩定財運'},
     {name:'黑曜石',col:'#222018',desc:'吸收負能量，消除壓力與疲勞，穩定情緒'}
   ]},
-  2:{e:'🟠',t:'合作・直覺',col:'#E07830',stones:[
+  2:{e:'🧡',t:'合作・直覺',col:'#E07830',stones:[
     {name:'太陽石',col:'#F4A623',desc:'增強自信心，提升正面能量，吸引豐盛與成功，招貴人'},
     {name:'橙月光石',col:'#E8902A',desc:'鎮定情緒，增強創造力，增強自信心'},
     {name:'月光石',col:'#C8C0B8',desc:'增強直覺與感知力，促進情感平衡，帶來柔和能量'},
@@ -318,35 +318,35 @@ var CD = {
     {name:'黃虎眼',col:'#C88020',desc:'提升自信與勇氣，招財聚財，提升事業運，保護能量'},
     {name:'黃阿塞',col:'#E8B830',desc:'正向思考，增強自信心，聚財，旺事業'}
   ]},
-  4:{e:'🟢',t:'穩定・務實',col:'#3A9A5A',stones:[
+  4:{e:'💚',t:'穩定・務實',col:'#3A9A5A',stones:[
     {name:'綠幽靈',col:'#3BAA70',desc:'招財，招好運，提升貴人運與事業運，療癒內心創傷'},
     {name:'葡萄石',col:'#7AB87A',desc:'撫平過去創傷，助財運，招正財，消除負能量，增強同理心'},
     {name:'天河石',col:'#5CAAAA',desc:'平衡身心靈能量，提升溝通能力，增強創造力，吸引財富'},
     {name:'草莓晶',col:'#E07080',desc:'招生意緣，增加個人魅力，強化直覺，釋放負面情緒'},
     {name:'綠草莓',col:'#50A060',desc:'招財，增強事業運，舒緩負面情緒，招人緣，淨化負能量'}
   ]},
-  5:{e:'🌊',t:'自由・變化',col:'#3A84C4',stones:[
+  5:{e:'💙',t:'自由・變化',col:'#3A84C4',stones:[
     {name:'海藍寶',col:'#5BA4C8',desc:'調整與平衡能量磁場，加強溝通表達能力，提升活力和自信心'},
     {name:'天河石',col:'#5CAAAA',desc:'平衡身心靈能量，提升溝通能力，增強創造力，吸引財富'},
     {name:'藍晶石',col:'#4878B8',desc:'增強溝通與表達能力，提高洞察力，安穩情緒，轉換新思維'},
     {name:'透體藍針',col:'#3468A8',desc:'擴大正面情緒，增強溝通與表達能力，提升專注力，淨化能量'},
     {name:'灰月光',col:'#909090',desc:'吸收負能量，促進人際關係，提高專注力和創造力，提升靈性'}
   ]},
-  6:{e:'💗',t:'愛・責任',col:'#D85880',stones:[
+  6:{e:'🩵',t:'愛・責任',col:'#D85880',stones:[
     {name:'粉晶',col:'#E8A8B8',desc:'療癒創傷，開啟新戀情，增進人緣，招生意緣，增加自信'},
     {name:'草莓晶',col:'#E07080',desc:'招生意緣，增加個人魅力，提升戀愛運，強化直覺與洞察力'},
     {name:'藍月光石',col:'#7090C8',desc:'舒緩壓力，減輕焦慮，修復情感創傷，增進魅力，提升直覺力'},
     {name:'堇青石',col:'#6878A8',desc:'改掉壞習慣，改善人際關係，生活自律，提高專注力，增強意志力'},
     {name:'灰月光',col:'#909090',desc:'吸收負能量，促進人際關係，提高專注力和創造力，提升靈性'}
   ]},
-  7:{e:'🔮',t:'智慧・靈性',col:'#7850B0',stones:[
+  7:{e:'💜',t:'智慧・靈性',col:'#7850B0',stones:[
     {name:'紫水晶',col:'#9370B8',desc:'專注思考，開發智慧與潛能，廣結人緣，貴人相助，鎮定情緒'},
     {name:'紫鋰輝',col:'#C090C0',desc:'療癒過去傷痛，消除緊張壓力，增進溝通協調，喚醒心中的愛'},
     {name:'白水晶',col:'#C8C8C8',desc:'淨化負能量，保持頭腦清晰，平衡身心靈，強化能量場，啟發靈性'},
     {name:'藍月光石',col:'#7090C8',desc:'舒緩壓力，減輕焦慮，修復情感創傷，提升直覺力'},
     {name:'白阿賽',col:'#E0DCD4',desc:'吸收負能量，淨化磁場，提高專注力，排解焦慮，增加正能量'}
   ]},
-  8:{e:'🐯',t:'豐盛・力量',col:'#C07820',stones:[
+  8:{e:'🤎',t:'豐盛・力量',col:'#C07820',stones:[
     {name:'金髮晶',col:'#D4A017',desc:'提高正財運，旺偏財，逢凶化吉，加強決策力'},
     {name:'虎眼石',col:'#C87820',desc:'財富吸引，強化行動力，提升意志力，保護能量'},
     {name:'茶晶',col:'#7A5C3A',desc:'吸收負能量，改善睡眠，平和情緒，穩定財運'},
@@ -478,12 +478,12 @@ function renderYinGrid(yinDigits,ly,masterNums,hasLunar){
   el.innerHTML=html;
 }
 
-function makeCard(n,type,masterNum,isTop){
+function makeCard(n,type,masterNum,isTop,masterNumCode){
   var cd=CD[n];
   var tagCls={master:'tg-m',both:'tg-b',yang:'tg-y',yin:'tg-n',ly:'tg-l',spare:'tg-s'};
   var tagLbl={master:masterNum?'大師數 '+masterNum:'主命數 '+n,both:'內外皆缺',yang:'外在缺',yin:'內在缺',ly:'流年',spare:'備選'};
   var sub={
-    master:masterNum?'大師數能量，比一般主命數 '+n+' 更強':'主命數核心，此生最重要的能量課題',
+    master:masterNum?(MDESC[masterNumCode]||'大師數能量，比一般主命數 '+n+' 更強'):'主命數核心，此生最重要的能量課題',
     both:'內外兩個面向皆薄弱，配戴優先度最高',
     yang:'外在表現上較難展現此數字特質',
     yin:'內心深層感受到此能量的匱乏',
@@ -650,7 +650,7 @@ function doCalc(){
 
     // 優先順序（主推薦最多3個）
     var priority=[];
-    if(lifeIsMiss)priority.push({n:solarLife.final,type:'master',mn:solarLife.isMaster?(solarLife.chain&&solarLife.chain.length>0?solarLife.chain.join('/'):solarLife.final):null});
+    if(lifeIsMiss)priority.push({n:solarLife.final,type:'master',mn:solarLife.isMaster?(solarLife.chain&&solarLife.chain.length>0?solarLife.chain.join('/'):solarLife.final):null,mnNum:solarLife.masterNum});
     missBoth.forEach(function(n){if(priority.length<3&&!priority.find(function(p){return p.n===n;}))priority.push({n:n,type:'both',mn:null});});
     if(priority.length<3&&!priority.find(function(p){return p.n===yangLyNum;}))priority.push({n:yangLyNum,type:'ly',mn:null});
 
@@ -665,7 +665,7 @@ function doCalc(){
     }
 
     document.getElementById('crystal-main').innerHTML=priority.length
-      ?priority.map(function(p,i){return makeCard(p.n,p.type,p.mn,i===0);}).join('')
+      ?priority.map(function(p,i){return makeCard(p.n,p.type,p.mn,i===0,p.mnNum);}).join('')
       :'<div style="font-size:12px;color:var(--text2);padding:8px">數字能量完整，可依喜好或流年選石。</div>';
 
     var spareHtml='';
