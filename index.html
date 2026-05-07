@@ -363,7 +363,8 @@ var CD = {
 var MDESC = {
   11:'超強直覺與靈性感知，是主命數 2 中能量最強的',
   22:'大師建造者，將夢想落地實現的強大執行力',
-  33:'大師療癒者，無條件的愛與奉獻，慈悲能量極強'
+  33:'大師療癒者，無條件的愛與奉獻，慈悲能量極強',
+  44:'大師師傅，靈性與物質完美整合，兼具建造與療癒的超強穩定能量'
 };
 var WIGE = {
   1:{farm:'選種',life:'新起點・播下意圖'},
@@ -394,7 +395,7 @@ function calcLifeYearChain(year, m, d, sign) {
     n = s;
     if (chain[chain.length-1] !== n) chain.push(n);
   }
-  return (sign||'(+)') + chain.join(' / ');
+  return (sign||'(+)') + ' ' + chain.join(' / ');
 }
 function getPosPeriod(birthY, birthM, birthD) {
   var today = new Date();
@@ -413,15 +414,17 @@ function getDigits(y,m,d){var s=new Set(),str=String(y)+String(m)+String(d);for(
 function calcLife(y,m,d){
   var str=String(y)+('0'+m).slice(-2)+('0'+d).slice(-2),total=0;
   for(var i=0;i<str.length;i++)total+=parseInt(str[i]);
-  var isMaster=(total===11||total===22||total===33);
   var transit=(total>=10)?total:null;
-  var finalNum=dsum(total);
   var chain=[];
   if(total>=10){var n2=total;while(n2>9){chain.push(n2);var s2=0,ns2=String(n2);for(var j=0;j<ns2.length;j++)s2+=parseInt(ns2[j]);n2=s2;}chain.push(n2);}
+  var finalNum=chain.length>0?chain[chain.length-1]:total;
+  var MASTERS=[11,22,33,44];
+  var isMaster=false,masterNum=null;
+  for(var k=0;k<chain.length-1;k++){if(MASTERS.indexOf(chain[k])!==-1){isMaster=true;masterNum=chain[k];break;}}
   var nums=new Set();
   if(transit!==null){var ts=String(transit);for(var i=0;i<ts.length;i++){var n=parseInt(ts[i]);if(n>=1)nums.add(n);}}
   nums.add(finalNum);
-  return{transit:transit,final:finalNum,isMaster:isMaster,masterNum:isMaster?total:null,nums:nums,chain:chain};
+  return{transit:transit,final:finalNum,isMaster:isMaster,masterNum:masterNum,nums:nums,chain:chain};
 }
 function getLY(y,m,d){var cy=new Date().getFullYear(),total=d+m,ys=String(cy);for(var i=0;i<ys.length;i++)total+=parseInt(ys[i]);return dsum(total);}
 
@@ -478,7 +481,7 @@ function renderYinGrid(yinDigits,ly,masterNums,hasLunar){
 function makeCard(n,type,masterNum,isTop){
   var cd=CD[n];
   var tagCls={master:'tg-m',both:'tg-b',yang:'tg-y',yin:'tg-n',ly:'tg-l',spare:'tg-s'};
-  var tagLbl={master:masterNum?'大師數 '+masterNum+'/'+n:'主命數 '+n,both:'內外皆缺',yang:'外在缺',yin:'內在缺',ly:'流年',spare:'備選'};
+  var tagLbl={master:masterNum?'大師數 '+masterNum:'主命數 '+n,both:'內外皆缺',yang:'外在缺',yin:'內在缺',ly:'流年',spare:'備選'};
   var sub={
     master:masterNum?'大師數能量，比一般主命數 '+n+' 更強':'主命數核心，此生最重要的能量課題',
     both:'內外兩個面向皆薄弱，配戴優先度最高',
@@ -596,12 +599,12 @@ function doCalc(){
     renderYinGrid(yinDigits,yinLyNum||yangLyNum,lunarMasterNums,hasLunar);
 
     // 主命數顯示
-    var yls=solarLife.isMaster?'大師數 '+solarLife.masterNum+'/'+solarLife.final+'（'+CD[solarLife.final].t+'）':((solarLife.chain&&solarLife.chain.length>0?solarLife.chain.join('/'):solarLife.final)+'（'+CD[solarLife.final].t+'）');
+    var yls=(solarLife.isMaster?'大師數 ':'')+(solarLife.chain&&solarLife.chain.length>0?solarLife.chain.join('/'):solarLife.final)+'（'+CD[solarLife.final].t+'）';
     document.getElementById('yang-life').innerHTML=
       '主命數：<strong>'+yls+'</strong><br>'+
       '<span style="color:#B05000;font-size:10.5px;">陽曆 '+yangPP.str+'　位格 '+yangPos+'　流年 '+yangLyChain+'</span>';
     if(hasLunar&&lunarLife){
-      var yns=lunarLife.isMaster?'大師數 '+lunarLife.masterNum+'/'+lunarLife.final+'（'+CD[lunarLife.final].t+'）':((lunarLife.chain&&lunarLife.chain.length>0?lunarLife.chain.join('/'):lunarLife.final)+'（'+CD[lunarLife.final].t+'）');
+      var yns=(lunarLife.isMaster?'大師數 ':'')+(lunarLife.chain&&lunarLife.chain.length>0?lunarLife.chain.join('/'):lunarLife.final)+'（'+CD[lunarLife.final].t+'）';
       document.getElementById('yin-life').innerHTML=
         '主命數：<strong>'+yns+'</strong><br>'+
         '<span style="color:#1E3A7A;font-size:10.5px;">陰曆 '+yinPP.str+'　位格 '+yinPos+'　流年 '+yinLyChain+'</span>';
@@ -611,8 +614,8 @@ function doCalc(){
 
     // 大師數提示
     var masterHtml='';
-    if(solarLife.isMaster)masterHtml+='<div class="master-box master-yang">★ <strong>'+name+' 的陽曆主命數是大師數 '+solarLife.masterNum+'/'+solarLife.final+'</strong><br>'+MDESC[solarLife.masterNum]+'。這個 '+solarLife.final+' 的能量遠比一般主命數更強，諮詢時可特別說明。</div>';
-    if(hasLunar&&lunarLife&&lunarLife.isMaster)masterHtml+='<div class="master-box master-yin">★ <strong>'+name+' 的陰曆主命數也是大師數 '+lunarLife.masterNum+'/'+lunarLife.final+'</strong><br>'+MDESC[lunarLife.masterNum]+'（陰曆內在層次）。</div>';
+    if(solarLife.isMaster){var ylsM=solarLife.chain&&solarLife.chain.length>0?solarLife.chain.join('/'):solarLife.final;masterHtml+='<div class="master-box master-yang">★ <strong>'+name+' 的陽曆主命數是大師數 '+ylsM+'</strong><br>'+(MDESC[solarLife.masterNum]||'大師數能量')+'。這個 '+solarLife.final+' 的能量遠比一般主命數更強，諮詢時可特別說明。</div>';}
+    if(hasLunar&&lunarLife&&lunarLife.isMaster){var ynsM=lunarLife.chain&&lunarLife.chain.length>0?lunarLife.chain.join('/'):lunarLife.final;masterHtml+='<div class="master-box master-yin">★ <strong>'+name+' 的陰曆主命數也是大師數 '+ynsM+'</strong><br>'+(MDESC[lunarLife.masterNum]||'大師數能量')+'（陰曆內在層次）。</div>';}
     document.getElementById('master-area').innerHTML=masterHtml;
 
     // 摘要
@@ -634,7 +637,7 @@ function doCalc(){
 
     var chipsHtml='';
     if(lifeIsMiss){
-      var ll=solarLife.isMaster?'大師數 '+solarLife.masterNum+'/'+solarLife.final+' 缺':((solarLife.chain&&solarLife.chain.length>0?solarLife.chain.join('/'):solarLife.final)+' 缺');
+      var ll=(solarLife.isMaster?'大師數 ':'')+(solarLife.chain&&solarLife.chain.length>0?solarLife.chain.join('/'):solarLife.final)+' 缺';
       chipsHtml+='<span class="chip ch-master">'+ll+'</span>';
     }
     missBoth.forEach(function(n){if(n!==solarLife.final)chipsHtml+='<span class="chip ch-both">數字'+n+' 內外皆缺</span>';});
@@ -647,7 +650,7 @@ function doCalc(){
 
     // 優先順序（主推薦最多3個）
     var priority=[];
-    if(lifeIsMiss)priority.push({n:solarLife.final,type:'master',mn:solarLife.isMaster?solarLife.masterNum:null});
+    if(lifeIsMiss)priority.push({n:solarLife.final,type:'master',mn:solarLife.isMaster?(solarLife.chain&&solarLife.chain.length>0?solarLife.chain.join('/'):solarLife.final):null});
     missBoth.forEach(function(n){if(priority.length<3&&!priority.find(function(p){return p.n===n;}))priority.push({n:n,type:'both',mn:null});});
     if(priority.length<3&&!priority.find(function(p){return p.n===yangLyNum;}))priority.push({n:yangLyNum,type:'ly',mn:null});
 
@@ -748,14 +751,10 @@ function buildPrintHtml(a, stones, msg) {
     return h+'</div>';
   }
 
-  var yls=a.solarLife.isMaster
-    ?'大師數 '+a.solarLife.masterNum+'/'+a.solarLife.final+'（'+CD[a.solarLife.final].t+'）'
-    :((a.solarLife.chain&&a.solarLife.chain.length>0?a.solarLife.chain.join('/'):a.solarLife.final)+'（'+CD[a.solarLife.final].t+'）');
+  var yls=(a.solarLife.isMaster?'大師數 ':'')+(a.solarLife.chain&&a.solarLife.chain.length>0?a.solarLife.chain.join('/'):a.solarLife.final)+'（'+CD[a.solarLife.final].t+'）';
   var yns='';
   if(a.hasLunar&&a.lunarLife)
-    yns=a.lunarLife.isMaster
-      ?'大師數 '+a.lunarLife.masterNum+'/'+a.lunarLife.final+'（'+CD[a.lunarLife.final].t+'）'
-      :((a.lunarLife.chain&&a.lunarLife.chain.length>0?a.lunarLife.chain.join('/'):a.lunarLife.final)+'（'+CD[a.lunarLife.final].t+'）');
+    yns=(a.lunarLife.isMaster?'大師數 ':'')+(a.lunarLife.chain&&a.lunarLife.chain.length>0?a.lunarLife.chain.join('/'):a.lunarLife.final)+'（'+CD[a.lunarLife.final].t+'）';
 
   var typeLbl={master:'主命數缺失',both:'內外皆缺',yang:'外在面向缺',yin:'內在面向缺',ly:'今年流年',spare:'補充能量'};
   var typeCol={master:'#C84040',both:'#7A6AA0',yang:'#BA7517',yin:'#3B5BA5',ly:'#0F6E56',spare:'#9c9a92'};
