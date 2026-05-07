@@ -219,6 +219,7 @@ footer { text-align: center; font-size: 11px; color: var(--text3); padding: 1.5r
       </div>
       <div class="sec">缺數清單（優先度排序）</div>
       <div id="miss-chips" class="chips"></div>
+      <div id="ly-desc" style="margin-top:10px;"></div>
     </div>
     <div class="card">
       <div class="sec" style="display:flex;justify-content:space-between;align-items:center;">
@@ -320,6 +321,7 @@ function resetForm() {
   document.getElementById('lunar-auto-hint').style.display='none';
   document.getElementById('result').classList.add('hidden');
   document.getElementById('master-area').innerHTML='';
+  document.getElementById('ly-desc').innerHTML='';
   currentAnalysis=null;
 }
 var CD = {
@@ -434,6 +436,22 @@ function getPosPeriod(birthY, birthM, birthD) {
   return {startY:startY, str:startY+'/'+f(birthM)+'/'+f(birthD)+'~'+(startY+1)+'/'+f(eDate.getMonth()+1)+'/'+f(eDate.getDate())};
 }
 var LUCKY_UNIT = [1,4,1,3,1,1];
+
+var PYEAR_DESC = {
+  1:'象徵全新的開始與獨立，是確立目標、播下種子的一年，適合開啟新計畫。',
+  2:'重心轉向人際互動與情感連結，需學習耐心、傾聽並在和諧中尋求平衡。',
+  3:'能量活躍且豐富，適合發揮創意、社交活動，並透過自我表達展現才華。',
+  4:'強調穩定與結構，是專注於工作、建立基礎與尋求安全感的耕耘期。',
+  5:'充滿變動與新機會，鼓勵打破常規、體驗自由，並從多元的嘗試中學習。',
+  6:'回歸家庭與愛的核心，是承擔責任、照顧他人並學習寬恕與療癒的一年。',
+  7:'能量向內收斂，適合深度學習、冥想與自我覺察，以探尋生命更深層的意義。',
+  8:'展現權威與力量的時刻，是過去努力收穫成果的階段，需處理金錢與權力的平衡。',
+  9:'循環的終點，象徵智慧的整合與清理。適合放下不再適用的事物，為下一個循環做準備。'
+};
+var PYEAR_TITLE = {
+  1:'開創與種植',2:'溝通與合作',3:'表達與創意',4:'務實與紮根',5:'轉變與冒險',
+  6:'責任與奉獻',7:'內省與真理',8:'收割與成就',9:'圓滿與斷捨離'
+};
 
 function dsum(n){while(n>9){var s=0,str=String(n);for(var i=0;i<str.length;i++)s+=parseInt(str[i]);n=s;}return n;}
 function getDigits(y,m,d){var s=new Set(),str=String(y)+String(m)+String(d);for(var i=0;i<str.length;i++){var n=parseInt(str[i]);if(n>=1&&n<=9)s.add(n);}return s;}
@@ -675,6 +693,24 @@ function doCalc(){
     if(!chipsHtml)chipsHtml='<span style="font-size:12px;color:var(--text2)">數字能量完整，可依喜好選石。</span>';
     document.getElementById('miss-chips').innerHTML=chipsHtml;
 
+    // 位格年說明
+    var lyDescHtml='<div style="font-size:11.5px;color:#5f5e5a;line-height:1.8;padding:8px 4px 2px;">'
+      +'<div style="margin-bottom:6px;color:#3a3a38;">彩虹數字的位格年（流年）以 9 年為一個循環，每個階段都承載著不同的生命能量與功課：</div>';
+    lyDescHtml+='<div style="margin-bottom:4px;padding:6px 10px;background:#fdf9f1;border-left:3px solid #B05000;border-radius:0 5px 5px 0;">'
+      +'<span style="color:#B05000;font-weight:600;">☀️ 陽曆流年 '+yangLyNum+' 位格年（'+PYEAR_TITLE[yangLyNum]+'）</span><br>'
+      +PYEAR_DESC[yangLyNum]
+      +'</div>';
+    if(hasLunar&&yinLyNum&&yinLyNum!==yangLyNum){
+      lyDescHtml+='<div style="padding:6px 10px;background:#f5f8ff;border-left:3px solid #3B5BA5;border-radius:0 5px 5px 0;">'
+        +'<span style="color:#3B5BA5;font-weight:600;">🌙 陰曆流年 '+yinLyNum+' 位格年（'+PYEAR_TITLE[yinLyNum]+'）</span><br>'
+        +PYEAR_DESC[yinLyNum]
+        +'</div>';
+    } else if(hasLunar&&yinLyNum&&yinLyNum===yangLyNum){
+      lyDescHtml+='<div style="font-size:10.5px;color:#999;margin-top:2px;">陰曆流年與陽曆流年相同（'+yinLyNum+' 位格年）</div>';
+    }
+    lyDescHtml+='</div>';
+    document.getElementById('ly-desc').innerHTML=lyDescHtml;
+
     // 優先順序（主推薦最多3個）
     var priority=[];
     if(lifeIsMiss)priority.push({n:solarLife.final,type:'master',mn:solarLife.isMaster?(solarLife.chain&&solarLife.chain.length>0?solarLife.chain.join('/'):solarLife.final):null,mnNum:solarLife.masterNum});
@@ -881,6 +917,21 @@ function buildPrintHtml(a, stones, msg, withLogo) {
     +'</div>'
     +'</div>'
     +legendHtml
+    // 位格年說明
+    +secTitle('位格年（流年）')
+    +'<div style="font-size:9px;color:#5f5e5a;line-height:1.75;margin-bottom:6px;">'
+    +'<div style="margin-bottom:5px;">彩虹數字的位格年（流年）以 9 年為一個循環，每個階段都承載著不同的生命能量與功課：</div>'
+    +'<div style="margin-bottom:4px;padding:5px 8px;background:#fdf9f1;border-left:2.5px solid #B05000;border-radius:0 4px 4px 0;">'
+    +'<strong style="color:#B05000;">☀️ 陽曆流年 '+a.yangLyNum+' 位格年（'+PYEAR_TITLE[a.yangLyNum]+'）</strong><br>'
+    +PYEAR_DESC[a.yangLyNum]
+    +'</div>'
+    +(a.yinLyNum&&a.yinLyNum!==a.yangLyNum
+      ?'<div style="padding:5px 8px;background:#f5f8ff;border-left:2.5px solid #3B5BA5;border-radius:0 4px 4px 0;">'
+       +'<strong style="color:#3B5BA5;">🌙 陰曆流年 '+a.yinLyNum+' 位格年（'+PYEAR_TITLE[a.yinLyNum]+'）</strong><br>'
+       +PYEAR_DESC[a.yinLyNum]
+       +'</div>'
+      :'<div style="font-size:8.5px;color:#aaa;">陰曆流年與陽曆流年相同（'+a.yangLyNum+' 位格年）</div>')
+    +'</div>'
     // 已選水晶
     +secTitle('已選水晶配置')
     +'<div style="margin-bottom:7px;">'+stonesHtml+'</div>'
