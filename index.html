@@ -923,7 +923,7 @@ function buildPrintHtml(a, stones, msg, withLogo) {
           +'<span style="font-size:8.5px;color:#5f5e5a;line-height:1.4;">'+s.desc+'</span>'
           +'</div>';
       }).join('');
-      var marker = (gi === splitAt) ? '<div id="pdf-page-break" style="height:0;overflow:hidden;"></div>' : '';
+      var marker = (gi === splitAt) ? '<div id="pdf-page-break" style="height:48px;"></div>' : '';
       return marker + '<div style="border:1px solid #e8e5dc;border-radius:7px;padding:6px 8px;margin-bottom:5px;">'+header+items+'</div>';
     }).join('');
   }
@@ -1059,9 +1059,11 @@ function doPrint() {
       // Push the page-break marker to exactly y=pdfH_px by adding top padding
       var breakMarker = node.querySelector('#pdf-page-break');
       if (breakMarker) {
+        // marker height = extraBottom(24) + topPad(24) = 48px, straddles the page cut
+        var extraBottom = 24, topPad = 24;
         var nodeTop = node.getBoundingClientRect().top;
         var markerY = breakMarker.getBoundingClientRect().top - nodeTop;
-        var pad = pdfH_px - markerY;
+        var pad = pdfH_px - extraBottom - markerY;
         breakMarker.style.marginTop = (pad > 0 ? Math.ceil(pad) : 0) + 'px';
       }
       var nodeH = node.scrollHeight;
