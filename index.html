@@ -171,19 +171,13 @@ footer { text-align: center; font-size: 11px; color: var(--text3); padding: 1.5r
       <div>
         <label>🌙 陰曆生日（內在面向）<span id="lunar-auto-hint" style="font-size:10px;color:#0F6E56;margin-left:6px;display:none;">✓ 自動帶入</span></label>
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px">
-          <div><label>西元年</label><input id="ily-year" type="number" placeholder="例：1998" min="1900" max="2100"></div>
-          <div>
-            <label style="display:flex;align-items:center;gap:6px;">
-              月
-              <label style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text2);font-weight:400;cursor:pointer;">
-                <input type="checkbox" id="ileap" style="width:13px;height:13px;accent-color:var(--accent);cursor:pointer;">閏月
-              </label>
-            </label>
-            <input id="ilm" type="number" placeholder="月" min="1" max="12">
-          </div>
+          <div><label>西元年</label><input id="ily-year" type="number" placeholder="例：1998" min="1900" max="2100" oninput="checkLeapHint()"></div>
+          <div><label>月</label><input id="ilm" type="number" placeholder="月" min="1" max="12" oninput="checkLeapHint()"></div>
           <div><label>日</label><input id="ild" type="number" placeholder="日" min="1" max="30"></div>
         </div>
-        <div class="hint">⚠️ 閏月請勾選「閏月」，計算時月份自動 +1；年頭出生者西元年可能不同</div>
+        <div id="leap-hint" style="display:none;margin-top:6px;"></div>
+        <input type="hidden" id="ileap" value="0">
+        <div class="hint">年頭出生者西元年可能不同</div>
       </div>
     </div>
     <div class="row2">
@@ -324,7 +318,8 @@ function resetForm() {
   ['iname','isolar-year','isolar-month','isolar-day','ily-year','ilm','ild','iwrist','imsg'].forEach(function(id){
     var el=document.getElementById(id); if(el) el.value='';
   });
-  document.getElementById('ileap').checked=false;
+  document.getElementById('ileap').value='0';
+  document.getElementById('leap-hint').style.display='none';
   document.getElementById('imm').value='8';
   document.getElementById('ifocus').value='both';
   document.getElementById('lunar-auto-hint').style.display='none';
@@ -444,6 +439,46 @@ function getPosPeriod(birthY, birthM, birthD) {
   var f = function(n){return ('0'+n).slice(-2);};
   return {startY:startY, str:startY+'/'+f(birthM)+'/'+f(birthD)+'~'+(startY+1)+'/'+f(eDate.getMonth()+1)+'/'+f(eDate.getDate())};
 }
+// 農曆閏月年表（西元年 → 閏月月份）
+var LUNAR_LEAP = {
+  1900:8,1903:5,1906:4,1909:2,1911:6,1914:5,1917:2,1919:7,
+  1922:5,1925:4,1928:2,1930:6,1933:5,1936:3,1938:7,
+  1941:6,1944:4,1947:2,1949:7,1952:5,1955:3,1957:8,
+  1960:6,1963:4,1966:3,1968:7,1971:5,1974:4,1976:8,
+  1979:6,1982:4,1984:10,1987:6,1990:5,1993:3,1995:8,
+  1998:5,2001:4,2004:2,2006:7,2009:5,2012:4,2014:9,
+  2017:6,2020:4,2023:2,2025:6,2028:5,2031:3,2033:11,
+  2036:6,2039:5,2042:2,2044:7,2047:5,2050:3
+};
+
+function checkLeapHint() {
+  var y = parseInt(document.getElementById('ily-year').value);
+  var m = parseInt(document.getElementById('ilm').value);
+  var hint = document.getElementById('leap-hint');
+  var leapInput = document.getElementById('ileap');
+  if (!y || !m || !LUNAR_LEAP[y] || LUNAR_LEAP[y] !== m) {
+    hint.style.display = 'none';
+    leapInput.value = '0';
+    return;
+  }
+  // 此年此月有閏月，顯示選擇
+  var cur = leapInput.value;
+  hint.style.display = 'block';
+  hint.innerHTML =
+    '<div style="font-size:11.5px;color:#8B5E1A;background:#fff8ed;border:1px solid #e8c97a;border-radius:6px;padding:6px 10px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">'
+    +'<span>⚠️ '+y+' 年有閏'+m+'月，請選擇：</span>'
+    +'<button type="button" onclick="setLeap(0)" id="leap-btn-no" style="padding:3px 10px;border-radius:4px;border:1px solid #ccc;cursor:pointer;font-size:11px;'+(cur==='0'?'background:#0F6E56;color:#fff;border-color:#0F6E56;':'background:#fff;color:#333;')+'">'
+    +'正'+m+'月</button>'
+    +'<button type="button" onclick="setLeap(1)" id="leap-btn-yes" style="padding:3px 10px;border-radius:4px;border:1px solid #ccc;cursor:pointer;font-size:11px;'+(cur==='1'?'background:#0F6E56;color:#fff;border-color:#0F6E56;':'background:#fff;color:#333;')+'">'
+    +'閏'+m+'月</button>'
+    +'</div>';
+}
+
+function setLeap(val) {
+  document.getElementById('ileap').value = String(val);
+  checkLeapHint(); // re-render to update button styles
+}
+
 var LUCKY_UNIT = [1,4,1,3,1,1];
 
 var PYEAR_DESC = {
@@ -618,7 +653,7 @@ function doCalc(){
     if(!syVal||!smVal||!sdVal){alert('請輸入陽曆生日（年、月、日）');return;}
     var sy=parseInt(syVal),sm=parseInt(smVal),sd=parseInt(sdVal);
     var lm=lmVal?parseInt(lmVal):0,ld=ldVal?parseInt(ldVal):0;
-    var isLeap=document.getElementById('ileap').checked;
+    var isLeap=document.getElementById('ileap').value==='1';
     var calcLm=(isLeap&&lm>0)?Math.min(lm+1,12):lm; // 閏月計算用月份
     var ly_y=lyYearVal?parseInt(lyYearVal):sy;
     var hasLunar=(lm>0&&ld>0);
