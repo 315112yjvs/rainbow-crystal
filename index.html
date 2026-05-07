@@ -532,6 +532,14 @@ function autoFillLunar(){
       document.getElementById('ild').value=ld;
       var hint=document.getElementById('lunar-auto-hint');
       if(hint){hint.style.display='inline';setTimeout(function(){hint.style.display='none';},3000);}
+      // 嘗試用中文 locale 自動偵測是否為閏月
+      var autoLeap=false;
+      try{
+        var mStr=new Intl.DateTimeFormat('zh-u-ca-chinese',{month:'long'}).format(d);
+        autoLeap=(mStr.charAt(0)==='閏');
+      }catch(e2){}
+      document.getElementById('ileap').value=autoLeap?'1':'0';
+      checkLeapHint();
     }
   }catch(e){}
 }
