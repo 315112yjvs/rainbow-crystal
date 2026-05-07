@@ -172,10 +172,18 @@ footer { text-align: center; font-size: 11px; color: var(--text3); padding: 1.5r
         <label>🌙 陰曆生日（內在面向）<span id="lunar-auto-hint" style="font-size:10px;color:#0F6E56;margin-left:6px;display:none;">✓ 自動帶入</span></label>
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px">
           <div><label>西元年</label><input id="ily-year" type="number" placeholder="例：1998" min="1900" max="2100"></div>
-          <div><label>月</label><input id="ilm" type="number" placeholder="月" min="1" max="12"></div>
+          <div>
+            <label style="display:flex;align-items:center;gap:6px;">
+              月
+              <label style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text2);font-weight:400;cursor:pointer;">
+                <input type="checkbox" id="ileap" style="width:13px;height:13px;accent-color:var(--accent);cursor:pointer;">閏月
+              </label>
+            </label>
+            <input id="ilm" type="number" placeholder="月" min="1" max="12">
+          </div>
           <div><label>日</label><input id="ild" type="number" placeholder="日" min="1" max="30"></div>
         </div>
-        <div class="hint">⚠️ 閏月者請確認月份，年頭出生者西元年可能不同</div>
+        <div class="hint">⚠️ 閏月請勾選「閏月」，計算時月份自動 +1；年頭出生者西元年可能不同</div>
       </div>
     </div>
     <div class="row2">
@@ -316,6 +324,7 @@ function resetForm() {
   ['iname','isolar-year','isolar-month','isolar-day','ily-year','ilm','ild','iwrist','imsg'].forEach(function(id){
     var el=document.getElementById(id); if(el) el.value='';
   });
+  document.getElementById('ileap').checked=false;
   document.getElementById('imm').value='8';
   document.getElementById('ifocus').value='both';
   document.getElementById('lunar-auto-hint').style.display='none';
@@ -600,6 +609,8 @@ function doCalc(){
     if(!syVal||!smVal||!sdVal){alert('請輸入陽曆生日（年、月、日）');return;}
     var sy=parseInt(syVal),sm=parseInt(smVal),sd=parseInt(sdVal);
     var lm=lmVal?parseInt(lmVal):0,ld=ldVal?parseInt(ldVal):0;
+    var isLeap=document.getElementById('ileap').checked;
+    var calcLm=(isLeap&&lm>0)?Math.min(lm+1,12):lm; // 閏月計算用月份
     var ly_y=lyYearVal?parseInt(lyYearVal):sy;
     var hasLunar=(lm>0&&ld>0);
     var wrist=wristVal?parseFloat(wristVal):0;
@@ -617,8 +628,8 @@ function doCalc(){
     // 陰曆（獨立）
     var yinDigits=new Set(),lunarLife=null,lunarMasterNums=new Set();
     if(hasLunar){
-      yinDigits=getDigits(ly_y,lm,ld);
-      lunarLife=calcLife(ly_y,lm,ld);
+      yinDigits=getDigits(ly_y,calcLm,ld);
+      lunarLife=calcLife(ly_y,calcLm,ld);
       lunarLife.nums.forEach(function(n){yinDigits.add(n);});
       if(lunarLife.isMaster){
         var ms2=String(lunarLife.masterNum);
@@ -634,9 +645,9 @@ function doCalc(){
     var yangLyNum=parseInt(yangLyChain.split(' / ').pop());
     var yinPos=null,yinPP=null,yinLyChain=null,yinLyNum=null;
     if(hasLunar&&lunarLife){
-      yinPos=calcPosition(ly_y,lm,ld);
-      yinPP=getPosPeriod(ly_y,lm,ld);
-      yinLyChain=calcLifeYearChain(yinPP.startY,lm,ld,'(-)');
+      yinPos=calcPosition(ly_y,calcLm,ld);
+      yinPP=getPosPeriod(ly_y,calcLm,ld);
+      yinLyChain=calcLifeYearChain(yinPP.startY,calcLm,ld,'(-)');
       yinLyNum=parseInt(yinLyChain.split(' / ').pop());
     }
 
@@ -664,8 +675,9 @@ function doCalc(){
     document.getElementById('master-area').innerHTML=masterHtml;
 
     // 摘要
+    var lunarLabel=hasLunar?('陰曆 '+ly_y+'/'+(isLeap?'閏':'')+lm+'/'+ld+(isLeap?' → 計算用'+calcLm+'月':'')):null;
     document.getElementById('sumbox').innerHTML=
-      '<strong>'+name+'</strong>｜☀️ 陽曆 '+sy+'/'+sm+'/'+sd+'　🌙 '+(hasLunar?'陰曆 '+ly_y+'/'+lm+'/'+ld:'陰曆（未輸入）');
+      '<strong>'+name+'</strong>｜☀️ 陽曆 '+sy+'/'+sm+'/'+sd+'　🌙 '+(lunarLabel||'陰曆（未輸入）');
 
     // 缺數分析
     var missBoth=[],missYang=[],missYin=[];
@@ -775,7 +787,7 @@ function doCalc(){
 
     currentAnalysis = {
       name:name, sy:sy, sm:sm, sd:sd,
-      ly_y:ly_y, lm:lm, ld:ld, hasLunar:hasLunar,
+      ly_y:ly_y, lm:lm, calcLm:calcLm, isLeap:isLeap, ld:ld, hasLunar:hasLunar,
       lyNum:yangLyNum, yangLyNum:yangLyNum, yinLyNum:yinLyNum, wrist:wrist, mm:mm,
       solarLife:solarLife, lunarLife:lunarLife,
       yangDigits:yangDigits, yinDigits:yinDigits,
@@ -901,7 +913,7 @@ function buildPrintHtml(a, stones, msg, withLogo) {
     +'<div style="font-size:15px;font-weight:800;color:#fff;writing-mode:vertical-rl;letter-spacing:0.08em;">'+a.name+'</div>'
     +'</div>'
     +'<div style="padding:6px 10px;display:flex;flex-direction:column;justify-content:center;gap:2px;">'
-    +'<div style="font-size:9.5px;color:#3a3a38;">☀️ 陽曆　'+a.sy+'/'+a.sm+'/'+a.sd+'　　🌙 陰曆　'+(a.hasLunar?a.ly_y+'/'+a.lm+'/'+a.ld:'未輸入')+'</div>'
+    +'<div style="font-size:9.5px;color:#3a3a38;">☀️ 陽曆　'+a.sy+'/'+a.sm+'/'+a.sd+'　　🌙 陰曆　'+(a.hasLunar?a.ly_y+'/'+(a.isLeap?'閏':'')+a.lm+'/'+a.ld+(a.isLeap?' (計算用'+a.calcLm+'月)':''):'未輸入')+'</div>'
     +'<div style="font-size:9.5px;color:#3a3a38;">陽曆流年 <strong style="color:#B05000;">'+a.yangLyNum+'</strong>'+(a.yinLyNum&&a.yinLyNum!==a.yangLyNum?'　陰曆流年 <strong style="color:#3B5BA5;">'+a.yinLyNum+'</strong>':'')+'　　手圍 '+(a.wrist>0?a.wrist+'cm':'未填')+'　珠徑 '+a.mm+'mm</div>'
     +'</div>'
     +'</div>'
