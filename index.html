@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>彩虹數字 × 水晶手鍊客製化工具</title>
+<title>彩虹水晶手鍊客製化工具</title>
 <style>
 @font-face {
   font-family: 'JinXuan';
@@ -135,7 +135,7 @@ footer { text-align: center; font-size: 11px; color: var(--text3); padding: 1.5r
 </head>
 <body>
 <header>
-  <h1>✦ 彩虹數字 × 水晶手鍊</h1>
+  <h1>✦ 彩虹水晶手鍊</h1>
   <p>輸入陽曆與陰曆生日，找出專屬能量缺口，設計客製化水晶手鍊</p>
 </header>
 <div class="container">
@@ -183,7 +183,7 @@ footer { text-align: center; font-size: 11px; color: var(--text3); padding: 1.5r
         </select>
       </div>
     </div>
-    <button class="btn" id="calcbtn">✦ 分析彩虹數字 &amp; 設計水晶手鍊</button>
+    <button class="btn" id="calcbtn">✦ 分析彩虹水晶手鍊分析</button>
   </div>
 
   <div id="result" class="hidden">
@@ -290,7 +290,7 @@ footer { text-align: center; font-size: 11px; color: var(--text3); padding: 1.5r
   </div>
 </div>
 </div>
-<footer>彩虹數字 × 水晶手鍊客製化工具 ✦ 僅供諮詢參考使用</footer>
+<footer>彩虹水晶手鍊客製化工具 ✦ 僅供諮詢參考使用</footer>
 <div id="print-area"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="jspdf.umd.min.js"></script>
@@ -821,8 +821,8 @@ function buildPrintHtml(a, stones, msg) {
     // 標題區
     +'<div style="text-align:center;padding:6px 0 6px;margin-bottom:8px;border-bottom:1.5px solid #c8c4b8;">'
     +'<div style="font-size:5px;letter-spacing:0.4em;color:#9c9a92;margin-bottom:3px;">✦ ✦ ✦</div>'
-    +'<div style="font-size:16px;font-weight:800;letter-spacing:0.04em;color:#1a1a18;">彩虹數字 × 水晶手鍊</div>'
-    +'<div style="font-size:8.5px;color:#9c9a92;margin-top:2px;letter-spacing:0.06em;">客製化分析報告　'+dateStr+'</div>'
+    +'<div style="font-size:16px;font-weight:800;letter-spacing:0.04em;color:#1a1a18;">彩虹水晶手鍊</div>'
+    +'<div style="font-size:8.5px;color:#9c9a92;margin-top:2px;letter-spacing:0.06em;">客製化分析報告</div>'
     +'</div>'
     // 客戶資訊
     +'<div style="display:grid;grid-template-columns:auto 1fr;background:#f7f6f2;border-radius:8px;overflow:hidden;margin-bottom:8px;">'
@@ -859,7 +859,7 @@ function buildPrintHtml(a, stones, msg) {
       +'<div style="background:#fdfcf7;border:1px dashed #c8c4b8;border-radius:7px;padding:7px 11px;font-size:10px;color:#3a3a38;line-height:1.8;margin-bottom:7px;white-space:pre-wrap;">'+msg.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')+'</div>'
       : '')
     // Footer
-    +'<div style="text-align:center;font-size:8px;color:#c0bdb5;margin-top:8px;padding-top:6px;border-top:0.5px solid #dedad2;letter-spacing:0.06em;">彩虹數字 × 水晶手鍊　✦　僅供諮詢參考使用</div>'
+    +'<div style="text-align:center;font-size:8px;color:#c0bdb5;margin-top:8px;padding-top:6px;border-top:0.5px solid #dedad2;letter-spacing:0.06em;">彩虹水晶手鍊　✦　僅供諮詢參考使用</div>'
     +'</div>';
 }
 
