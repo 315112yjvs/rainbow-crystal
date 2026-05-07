@@ -292,7 +292,7 @@ footer { text-align: center; font-size: 11px; color: var(--text3); padding: 1.5r
 </div>
 <footer>彩虹數字 × 水晶手鍊客製化工具 ✦ 僅供諮詢參考使用</footer>
 <div id="print-area"></div>
-<script src="dom-to-image.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="jspdf.umd.min.js"></script>
 <script>
 var currentAnalysis = null;
@@ -878,15 +878,15 @@ function doPrint() {
   var btn = document.getElementById('pdf-btn');
   if (btn) { btn.disabled = true; btn.textContent = '⏳ 產生中...'; }
 
-  var overlay = document.createElement('div');
-  overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(247,246,242,0.96);z-index:9999;display:flex;align-items:center;justify-content:center;font-size:15px;color:#5f5e5a;';
-  overlay.innerHTML = '<div>⏳ 正在產生 PDF，請稍候…</div>';
-  document.body.appendChild(overlay);
-
   var node = document.createElement('div');
-  node.style.cssText = 'position:fixed;top:0;left:-2000px;width:560px;background:#fff;padding:28px;box-sizing:border-box;z-index:10000;';
+  node.style.cssText = 'position:fixed;top:0;left:0;width:560px;background:#fff;padding:28px;box-sizing:border-box;z-index:10000;';
   node.innerHTML = buildPrintHtml(a, stones, msg);
   document.body.appendChild(node);
+
+  var overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(247,246,242,0.96);z-index:10001;display:flex;align-items:center;justify-content:center;font-size:15px;color:#5f5e5a;';
+  overlay.innerHTML = '<div>⏳ 正在產生 PDF，請稍候…</div>';
+  document.body.appendChild(overlay);
 
   function cleanup() {
     document.body.removeChild(node);
@@ -895,19 +895,18 @@ function doPrint() {
   }
 
   setTimeout(function() {
-    var scale = 3;
     var nodeW = 560, nodeH = node.scrollHeight;
-    domtoimage.toPng(node, {
-      bgcolor: '#ffffff',
-      width: nodeW * scale,
-      height: nodeH * scale,
-      style: {
-        transform: 'scale(' + scale + ')',
-        transformOrigin: 'top left',
-        width: nodeW + 'px',
-        height: nodeH + 'px'
-      }
-    }).then(function(dataUrl) {
+    html2canvas(node, {
+      scale: 3,
+      backgroundColor: '#ffffff',
+      useCORS: true,
+      allowTaint: false,
+      logging: false,
+      width: nodeW,
+      height: nodeH,
+      windowWidth: nodeW
+    }).then(function(canvas) {
+        var dataUrl = canvas.toDataURL('image/png');
         var jsPDF = window.jspdf.jsPDF;
         var pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a5' });
         var pdfW = pdf.internal.pageSize.getWidth();
@@ -932,7 +931,7 @@ function doPrint() {
         alert('PDF 產生失敗：' + e);
         cleanup();
       });
-  }, 300);
+  }, 500);
 }
 
 function updateBraceletFromChecked() {
