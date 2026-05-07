@@ -943,7 +943,7 @@ function doPrint() {
           var pdfH = pdf.internal.pageSize.getHeight();
           var imgH = nodeH / (nodeW / pdfW);
           var position = 0;
-          pdf.addImage(dataUrl, 'JPEG', 0, 0, pdfW, Math.min(imgH, pdfH));
+          pdf.addImage(dataUrl, 'JPEG', 0, 0, pdfW, imgH);
           while (imgH - Math.abs(position) > pdfH) {
             position -= pdfH;
             pdf.addPage();
