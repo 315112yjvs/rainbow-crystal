@@ -922,7 +922,7 @@ function buildPrintHtml(a, stones, msg, withLogo) {
           +'<span style="font-size:8.5px;color:#5f5e5a;line-height:1.4;">'+s.desc+'</span>'
           +'</div>';
       }).join('');
-      return '<div style="border:1px solid #e8e5dc;border-radius:7px;padding:6px 8px;margin-bottom:5px;">'+header+items+'</div>';
+      return '<div class="pdf-no-break" style="border:1px solid #e8e5dc;border-radius:7px;padding:6px 8px;margin-bottom:5px;">'+header+items+'</div>';
     }).join('');
   }
 
@@ -1011,7 +1011,7 @@ function buildPrintHtml(a, stones, msg, withLogo) {
     +'<div style="margin-bottom:7px;">'+stonesHtml+'</div>'
     // 給客戶的一句話
     +(msg ? secTitle('給 '+a.name+' 的話')
-      +'<div style="background:#fdfcf7;border:1px dashed #c8c4b8;border-radius:7px;padding:7px 11px;font-size:10px;color:#3a3a38;line-height:1.8;margin-bottom:7px;white-space:pre-wrap;">'+msg.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')+'</div>'
+      +'<div class="pdf-no-break" style="background:#fdfcf7;border:1px dashed #c8c4b8;border-radius:7px;padding:7px 11px;font-size:10px;color:#3a3a38;line-height:1.8;margin-bottom:7px;white-space:pre-wrap;">'+msg.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')+'</div>'
       : '')
     // Footer
     +'<div style="text-align:center;font-size:8px;color:#c0bdb5;margin-top:8px;padding-top:6px;border-top:0.5px solid #dedad2;letter-spacing:0.06em;">彩虹水晶手鍊　✦　僅供諮詢參考使用</div>'
@@ -1051,7 +1051,21 @@ function doPrint() {
     }
 
     setTimeout(function() {
-      var nodeW = 560, nodeH = node.scrollHeight;
+      var nodeW = 560;
+      // Shift any card that straddles a page boundary down to the next page
+      var pdfH_px = 210 * nodeW / 148;
+      var nodeTop = node.getBoundingClientRect().top;
+      node.querySelectorAll('.pdf-no-break').forEach(function(card) {
+        var rect = card.getBoundingClientRect();
+        var cardTop = rect.top - nodeTop;
+        var pageStart = Math.floor(cardTop / pdfH_px);
+        var pageEnd = Math.floor((cardTop + rect.height - 1) / pdfH_px);
+        if (pageEnd > pageStart) {
+          var extra = Math.ceil((pageStart + 1) * pdfH_px - cardTop) + 10;
+          card.style.marginTop = ((parseInt(card.style.marginTop) || 0) + extra) + 'px';
+        }
+      });
+      var nodeH = node.scrollHeight;
       html2canvas(node, {
         scale: 3,
         backgroundColor: '#ffffff',
