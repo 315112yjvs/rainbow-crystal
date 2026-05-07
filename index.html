@@ -851,7 +851,7 @@ function buildPrintHtml(a, stones, msg, withLogo) {
     +'<div style="font-size:16px;font-weight:800;letter-spacing:0.04em;color:#1a1a18;">彩虹水晶手鍊</div>'
     +'<div style="font-size:8.5px;color:#9c9a92;margin-top:2px;letter-spacing:0.06em;">客製化分析報告</div>'
     +'</div>'
-    +(withLogo?'<img src="'+LOGO_DATA+'" style="width:44px;height:44px;object-fit:contain;flex-shrink:0;" crossorigin="anonymous">':'')
+    +(withLogo?'<img src="'+withLogo+'" style="width:44px;height:44px;object-fit:contain;flex-shrink:0;">':'')
     +'</div>'
     // 客戶資訊
     +'<div style="display:grid;grid-template-columns:auto 1fr;background:#f7f6f2;border-radius:8px;overflow:hidden;margin-bottom:8px;">'
@@ -907,71 +907,87 @@ function doPrint() {
   var btn = document.getElementById('pdf-btn');
   if (btn) { btn.disabled = true; btn.textContent = '⏳ 產生中...'; }
 
-  var node = document.createElement('div');
-  node.style.cssText = 'position:fixed;top:0;left:0;width:560px;background:#fff;padding:28px;box-sizing:border-box;z-index:10000;';
-  node.innerHTML = buildPrintHtml(a, stones, msg, withLogo);
-  document.body.appendChild(node);
+  function startRender(logoPng) {
+    var node = document.createElement('div');
+    node.style.cssText = 'position:fixed;top:0;left:0;width:560px;background:#fff;padding:28px;box-sizing:border-box;z-index:10000;';
+    node.innerHTML = buildPrintHtml(a, stones, msg, logoPng);
+    document.body.appendChild(node);
 
-  var overlay = document.createElement('div');
-  overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(247,246,242,0.96);z-index:10001;display:flex;align-items:center;justify-content:center;font-size:15px;color:#5f5e5a;';
-  overlay.innerHTML = '<div>⏳ 正在產生 PDF，請稍候…</div>';
-  document.body.appendChild(overlay);
+    var overlay = document.createElement('div');
+    overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(247,246,242,0.96);z-index:10001;display:flex;align-items:center;justify-content:center;font-size:15px;color:#5f5e5a;';
+    overlay.innerHTML = '<div>⏳ 正在產生 PDF，請稍候…</div>';
+    document.body.appendChild(overlay);
 
-  function cleanup() {
-    document.body.removeChild(node);
-    document.body.removeChild(overlay);
-    if (btn) { btn.disabled = false; btn.textContent = '⬇️ 儲存 PDF（A5）'; }
+    function cleanup() {
+      document.body.removeChild(node);
+      document.body.removeChild(overlay);
+      if (btn) { btn.disabled = false; btn.textContent = '⬇️ 儲存 PDF（A5）'; }
+    }
+
+    setTimeout(function() {
+      var nodeW = 560, nodeH = node.scrollHeight;
+      html2canvas(node, {
+        scale: 3,
+        backgroundColor: '#ffffff',
+        useCORS: true,
+        allowTaint: false,
+        logging: false,
+        width: nodeW,
+        height: nodeH,
+        windowWidth: nodeW
+      }).then(function(canvas) {
+          var dataUrl = canvas.toDataURL('image/jpeg', 0.88);
+          var jsPDF = window.jspdf.jsPDF;
+          var pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a5' });
+          var pdfW = pdf.internal.pageSize.getWidth();
+          var pdfH = pdf.internal.pageSize.getHeight();
+          var imgH = nodeH / (nodeW / pdfW);
+          var position = 0;
+          pdf.addImage(dataUrl, 'JPEG', 0, 0, pdfW, Math.min(imgH, pdfH));
+          while (imgH - Math.abs(position) > pdfH) {
+            position -= pdfH;
+            pdf.addPage();
+            pdf.addImage(dataUrl, 'JPEG', 0, position, pdfW, imgH);
+          }
+          var blob = pdf.output('blob');
+          var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+          if (isIOS) {
+            var file = new File([blob], filename, {type:'application/pdf'});
+            if (navigator.share && navigator.canShare && navigator.canShare({files:[file]})) {
+              navigator.share({files:[file], title:filename}).catch(function(){});
+            } else {
+              window.open(URL.createObjectURL(blob), '_blank');
+            }
+          } else {
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url; a.download = filename;
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a);
+            setTimeout(function(){URL.revokeObjectURL(url);}, 1000);
+          }
+          cleanup();
+        })
+        .catch(function(e) {
+          alert('PDF 產生失敗：' + e);
+          cleanup();
+        });
+    }, 500);
   }
 
-  setTimeout(function() {
-    var nodeW = 560, nodeH = node.scrollHeight;
-    html2canvas(node, {
-      scale: 3,
-      backgroundColor: '#ffffff',
-      useCORS: true,
-      allowTaint: false,
-      logging: false,
-      width: nodeW,
-      height: nodeH,
-      windowWidth: nodeW
-    }).then(function(canvas) {
-        var dataUrl = canvas.toDataURL('image/jpeg', 0.88);
-        var jsPDF = window.jspdf.jsPDF;
-        var pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a5' });
-        var pdfW = pdf.internal.pageSize.getWidth();
-        var pdfH = pdf.internal.pageSize.getHeight();
-        var imgH = nodeH / (nodeW / pdfW);
-        var position = 0;
-        pdf.addImage(dataUrl, 'JPEG', 0, 0, pdfW, Math.min(imgH, pdfH));
-        while (imgH - Math.abs(position) > pdfH) {
-          position -= pdfH;
-          pdf.addPage();
-          pdf.addImage(dataUrl, 'JPEG', 0, position, pdfW, imgH);
-        }
-        var blob = pdf.output('blob');
-        var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-        if (isIOS) {
-          var file = new File([blob], filename, {type:'application/pdf'});
-          if (navigator.share && navigator.canShare && navigator.canShare({files:[file]})) {
-            navigator.share({files:[file], title:filename}).catch(function(){});
-          } else {
-            window.open(URL.createObjectURL(blob), '_blank');
-          }
-        } else {
-          var url = URL.createObjectURL(blob);
-          var a = document.createElement('a');
-          a.href = url; a.download = filename;
-          document.body.appendChild(a); a.click();
-          document.body.removeChild(a);
-          setTimeout(function(){URL.revokeObjectURL(url);}, 1000);
-        }
-        cleanup();
-      })
-      .catch(function(e) {
-        alert('PDF 產生失敗：' + e);
-        cleanup();
-      });
-  }, 500);
+  if (withLogo) {
+    var img = new Image();
+    img.onload = function() {
+      var c = document.createElement('canvas');
+      c.width = 132; c.height = 132;
+      c.getContext('2d').drawImage(img, 0, 0, 132, 132);
+      startRender(c.toDataURL('image/png'));
+    };
+    img.onerror = function() { startRender(null); };
+    img.src = LOGO_DATA;
+  } else {
+    startRender(null);
+  }
 }
 
 function updateBraceletFromChecked() {
