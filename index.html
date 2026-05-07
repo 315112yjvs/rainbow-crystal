@@ -905,18 +905,18 @@ function doPrint() {
       height: nodeH,
       windowWidth: nodeW
     }).then(function(canvas) {
-        var dataUrl = canvas.toDataURL('image/png');
+        var dataUrl = canvas.toDataURL('image/jpeg', 0.88);
         var jsPDF = window.jspdf.jsPDF;
         var pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a5' });
         var pdfW = pdf.internal.pageSize.getWidth();
         var pdfH = pdf.internal.pageSize.getHeight();
         var imgH = nodeH / (nodeW / pdfW);
         var position = 0;
-        pdf.addImage(dataUrl, 'PNG', 0, 0, pdfW, Math.min(imgH, pdfH));
+        pdf.addImage(dataUrl, 'JPEG', 0, 0, pdfW, Math.min(imgH, pdfH));
         while (imgH - Math.abs(position) > pdfH) {
           position -= pdfH;
           pdf.addPage();
-          pdf.addImage(dataUrl, 'PNG', 0, position, pdfW, imgH);
+          pdf.addImage(dataUrl, 'JPEG', 0, position, pdfW, imgH);
         }
         var blob = pdf.output('blob');
         var file = new File([blob], filename, {type:'application/pdf'});
