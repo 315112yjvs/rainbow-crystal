@@ -696,15 +696,23 @@ function doCalc(){
     // 位格年說明
     var lyDescHtml='<div style="font-size:11.5px;color:#5f5e5a;line-height:1.8;padding:8px 4px 2px;">'
       +'<div style="margin-bottom:6px;color:#3a3a38;">彩虹數字的位格年以 9 年為一個循環，每個階段都承載著不同的生命能量與功課：</div>';
-    lyDescHtml+='<div style="margin-bottom:4px;padding:6px 10px;background:#fdf9f1;border-left:3px solid #B05000;border-radius:0 5px 5px 0;">'
-      +'<span style="color:#B05000;font-weight:600;">☀️ 陽曆　第 '+yangPos+' 位格年（'+PYEAR_TITLE[yangPos]+'）</span><br>'
-      +PYEAR_DESC[yangPos]
-      +'</div>';
-    if(hasLunar&&yinPos){
-      lyDescHtml+='<div style="padding:6px 10px;background:#f5f8ff;border-left:3px solid #3B5BA5;border-radius:0 5px 5px 0;">'
-        +'<span style="color:#3B5BA5;font-weight:600;">🌙 陰曆　第 '+yinPos+' 位格年（'+PYEAR_TITLE[yinPos]+'）</span><br>'
-        +PYEAR_DESC[yinPos]
+    if(hasLunar&&yinPos&&yinPos===yangPos){
+      lyDescHtml+='<div style="margin-bottom:4px;padding:6px 10px;background:#fdf9f1;border-left:3px solid #B05000;border-radius:0 5px 5px 0;">'
+        +'<span style="color:#B05000;font-weight:600;">☀️ 陽曆　第 '+yangPos+' 位格年（'+PYEAR_TITLE[yangPos]+'）</span>'
+        +'　<span style="color:#3B5BA5;font-weight:600;">🌙 陰曆</span><br>'
+        +PYEAR_DESC[yangPos]
         +'</div>';
+    } else {
+      lyDescHtml+='<div style="margin-bottom:4px;padding:6px 10px;background:#fdf9f1;border-left:3px solid #B05000;border-radius:0 5px 5px 0;">'
+        +'<span style="color:#B05000;font-weight:600;">☀️ 陽曆　第 '+yangPos+' 位格年（'+PYEAR_TITLE[yangPos]+'）</span><br>'
+        +PYEAR_DESC[yangPos]
+        +'</div>';
+      if(hasLunar&&yinPos){
+        lyDescHtml+='<div style="padding:6px 10px;background:#f5f8ff;border-left:3px solid #3B5BA5;border-radius:0 5px 5px 0;">'
+          +'<span style="color:#3B5BA5;font-weight:600;">🌙 陰曆　第 '+yinPos+' 位格年（'+PYEAR_TITLE[yinPos]+'）</span><br>'
+          +PYEAR_DESC[yinPos]
+          +'</div>';
+      }
     }
     lyDescHtml+='</div>';
     document.getElementById('ly-desc').innerHTML=lyDescHtml;
@@ -919,16 +927,22 @@ function buildPrintHtml(a, stones, msg, withLogo) {
     +secTitle('位格年')
     +'<div style="font-size:9px;color:#5f5e5a;line-height:1.75;margin-bottom:6px;">'
     +'<div style="margin-bottom:5px;">彩虹數字的位格年以 9 年為一個循環，每個階段都承載著不同的生命能量與功課：</div>'
-    +'<div style="margin-bottom:4px;padding:5px 8px;background:#fdf9f1;border-left:2.5px solid #B05000;border-radius:0 4px 4px 0;">'
-    +'<strong style="color:#B05000;">☀️ 陽曆　第 '+a.yangPos+' 位格年（'+PYEAR_TITLE[a.yangPos]+'）</strong><br>'
-    +PYEAR_DESC[a.yangPos]
-    +'</div>'
-    +(a.yinPos
-      ?'<div style="padding:5px 8px;background:#f5f8ff;border-left:2.5px solid #3B5BA5;border-radius:0 4px 4px 0;">'
-       +'<strong style="color:#3B5BA5;">🌙 陰曆　第 '+a.yinPos+' 位格年（'+PYEAR_TITLE[a.yinPos]+'）</strong><br>'
-       +PYEAR_DESC[a.yinPos]
+    +(a.yinPos&&a.yinPos===a.yangPos
+      ?'<div style="margin-bottom:4px;padding:5px 8px;background:#fdf9f1;border-left:2.5px solid #B05000;border-radius:0 4px 4px 0;">'
+       +'<strong style="color:#B05000;">☀️ 陽曆　第 '+a.yangPos+' 位格年（'+PYEAR_TITLE[a.yangPos]+'）</strong>'
+       +'　<strong style="color:#3B5BA5;">🌙 陰曆</strong><br>'
+       +PYEAR_DESC[a.yangPos]
        +'</div>'
-      :'')
+      :'<div style="margin-bottom:4px;padding:5px 8px;background:#fdf9f1;border-left:2.5px solid #B05000;border-radius:0 4px 4px 0;">'
+       +'<strong style="color:#B05000;">☀️ 陽曆　第 '+a.yangPos+' 位格年（'+PYEAR_TITLE[a.yangPos]+'）</strong><br>'
+       +PYEAR_DESC[a.yangPos]
+       +'</div>'
+       +(a.yinPos
+         ?'<div style="padding:5px 8px;background:#f5f8ff;border-left:2.5px solid #3B5BA5;border-radius:0 4px 4px 0;">'
+          +'<strong style="color:#3B5BA5;">🌙 陰曆　第 '+a.yinPos+' 位格年（'+PYEAR_TITLE[a.yinPos]+'）</strong><br>'
+          +PYEAR_DESC[a.yinPos]
+          +'</div>'
+         :''))
     +'</div>'
     // 已選水晶
     +secTitle('已選水晶配置')
