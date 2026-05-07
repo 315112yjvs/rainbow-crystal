@@ -1054,12 +1054,17 @@ function doPrint() {
     }
 
     setTimeout(function() {
-      var nodeW = 560, nodeH = node.scrollHeight;
-      // Measure page-break marker position (if present) before rendering
+      var nodeW = 560;
+      var pdfH_px = 210 * nodeW / 148; // A5 page height in node-pixels ≈ 794.6
+      // Push the page-break marker to exactly y=pdfH_px by adding top padding
       var breakMarker = node.querySelector('#pdf-page-break');
-      var cutY = breakMarker
-        ? Math.round((breakMarker.getBoundingClientRect().top - node.getBoundingClientRect().top) * 3)
-        : null;
+      if (breakMarker) {
+        var nodeTop = node.getBoundingClientRect().top;
+        var markerY = breakMarker.getBoundingClientRect().top - nodeTop;
+        var pad = pdfH_px - markerY;
+        breakMarker.style.marginTop = (pad > 0 ? Math.ceil(pad) : 0) + 'px';
+      }
+      var nodeH = node.scrollHeight;
       html2canvas(node, {
         scale: 3,
         backgroundColor: '#ffffff',
@@ -1078,11 +1083,7 @@ function doPrint() {
           var imgH = nodeH / (nodeW / pdfW);
           var dataUrl = canvas.toDataURL('image/jpeg', 0.88);
           pdf.addImage(dataUrl, 'JPEG', 0, 0, pdfW, imgH);
-          if (cutY !== null) {
-            var cutMm = cutY / sc * pdfW / nodeW;
-            pdf.addPage();
-            pdf.addImage(dataUrl, 'JPEG', 0, -cutMm, pdfW, imgH);
-          } else if (imgH > pdfH) {
+          if (imgH > pdfH) {
             var pos = -pdfH;
             while (imgH + pos > 0) { pdf.addPage(); pdf.addImage(dataUrl, 'JPEG', 0, pos, pdfW, imgH); pos -= pdfH; }
           }
