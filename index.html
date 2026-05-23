@@ -6,12 +6,12 @@
 <title>彩虹水晶手鍊客製化工具</title>
 <style>
 @font-face {
-  font-family: 'JinXuan';
-  src: url('金萱那堤jf-jinxuanlatte-2.0-bold.otf') format('opentype');
+  font-family: '六分糖';
+  src: url('六分糖.otf') format('opentype');
   font-weight: normal;
   font-style: normal;
 }
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; font-family: 'JinXuan', -apple-system, BlinkMacSystemFont, 'Noto Sans TC', sans-serif; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; font-family: '六分糖', -apple-system, BlinkMacSystemFont, 'Noto Sans TC', sans-serif; }
 :root {
   --bg: #ffffff; --bg2: #f7f6f2; --bg3: #f1efe8;
   --text: #1a1a18; --text2: #5f5e5a; --text3: #9c9a92;
@@ -25,7 +25,7 @@
     --border: rgba(255,255,255,0.08); --border2: rgba(255,255,255,0.18);
   }
 }
-body { font-family: 'JinXuan', -apple-system, BlinkMacSystemFont, 'Noto Sans TC', sans-serif; background: var(--bg3); color: var(--text); min-height: 100vh; }
+body { font-family: '六分糖', -apple-system, BlinkMacSystemFont, 'Noto Sans TC', sans-serif; background: var(--bg3); color: var(--text); min-height: 100vh; }
 header { background: var(--bg); border-bottom: 0.5px solid var(--border); padding: 1.25rem 1.5rem; text-align: center; }
 header h1 { font-size: 20px; font-weight: 600; }
 header p { font-size: 13px; color: var(--text2); margin-top: 4px; }
@@ -950,7 +950,7 @@ function buildPrintHtml(a, stones, msg, withLogo) {
       +'</div>';
   }
 
-  return '<div style="font-family:\'JinXuan\',-apple-system,BlinkMacSystemFont,\'Noto Sans TC\',sans-serif;color:#1a1a18;font-size:11px;line-height:1.5;">'
+  return '<div style="font-family:\'六分糖\',-apple-system,BlinkMacSystemFont,\'Noto Sans TC\',sans-serif;color:#1a1a18;font-size:11px;line-height:1.5;">'
     // 標題區
     +'<div style="display:flex;align-items:center;padding:6px 0 6px;margin-bottom:8px;border-bottom:1.5px solid #c8c4b8;">'
     +(withLogo?'<div style="width:44px;flex-shrink:0;"></div>':'')
